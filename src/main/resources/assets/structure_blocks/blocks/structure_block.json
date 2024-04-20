@@ -1,0 +1,10 @@
+{
+    "stringId": "structure_blocks:structure_block",
+    "blockStates":
+    {
+        "default": 
+        {
+            "modelName": "structure_blocks:model_structure"
+        }
+    }
+}

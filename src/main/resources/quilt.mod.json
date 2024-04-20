@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+
+  "quilt_loader": {
+    "group": "${mod_group}",
+    "id": "${mod_id}",
+    "version": "${mod_version}",
+
+    "intermediate_mappings":"net.fabricmc:intermediary",
+
+    "metadata": {
+      "name": "Structure Blocks",
+      "description": "A mod that allows you to save/place structures. Might be useful.",
+      "contributors": {
+        "NikRasOff": "Owner"
+      },
+
+      "contact": {
+        "homepage": "https://example.com/",
+        "issues": "https://codeberg.org/CRModders/cosmic-quilt-example/issues",
+        "sources": "https://codeberg.org/CRModders/cosmic-quilt-example"
+      },
+
+      "icon": "assets/structure_blocks/icon.png"
+    },
+
+    "entrypoints": {
+      "init": "com.nikrasoff.structure_blocks.StructureBlocks"
+    },
+
+    "depends": [
+      {
+        "id": "cosmicquilt",
+        "versions": ">=${cq_version}"
+      },
+      {
+        "id": "cosmicreach",
+        "versions": ">=${cr_version}"
+      },
+      {
+        "id": "fluxapi",
+        "versions": ">=${fluxapi_version}"
+      }
+    ]
+  },
+
+  "mixin": "structure_blocks.mixins.json"
+}
