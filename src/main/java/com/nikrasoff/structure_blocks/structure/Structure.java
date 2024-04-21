@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.nikrasoff.structure_blocks.StructureBlocks;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
+import com.nikrasoff.structure_blocks.util.BlockEntitySaver;
 import com.nikrasoff.structure_blocks.util.IntVector3;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.tags.Identifier;
@@ -52,7 +53,7 @@ public class Structure {
             ZipInputStream zipInputStream = new ZipInputStream(assetFile.read());
             ZipEntry entry = zipInputStream.getNextEntry();
 
-            if (version != 1) {
+            if (version < 1 || version > 2) {
                 output = "Unsupported version";
                 return false;
             }
@@ -110,6 +111,21 @@ public class Structure {
                     }
                 }
 
+                if (version >= 2 && entry.getName().equalsIgnoreCase("bed.bed")){
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    byte[] bytes = new byte[1024];
+                    int len;
+                    while ((len = zipInputStream.read(bytes)) > 0) {
+                        outputStream.write(bytes, 0, len);
+                    }
+
+                    FileHandle bedFile = new FileHandle(SaveLocation.getSaveFolderLocation() + "/temp.bed");
+                    bedFile.write(false).write(outputStream.toByteArray());
+
+                    BlockEntitySaver.loadBlockEntities(zone, new IntVector3(pos.getGlobalX(), pos.getGlobalY(), pos.getGlobalZ()), bedFile);
+                    bedFile.delete();
+                }
+
                 entry = zipInputStream.getNextEntry();
             }
             zipInputStream.close();
@@ -164,6 +180,8 @@ public class Structure {
             }
         }
 
+        FileHandle bedFile = BlockEntitySaver.saveBlockEntities(minPos, maxPos, SaveLocation.getSaveFolderLocation() + "temp.bed");
+
         JsonValue structureInfo = new JsonValue(JsonValue.ValueType.object);
         structureInfo.addChild("structureVersion", new JsonValue(StructureBlocks.STRUCTURE_SAVE_VERSION));
         maxPos.sub(minPos);
@@ -185,6 +203,7 @@ public class Structure {
         ZipEntry infoEntry = new ZipEntry("structure_info.json");
         ZipEntry blockPaletteEntry = new ZipEntry("block_palette.json");
         ZipEntry structureEntry = new ZipEntry("structure");
+        ZipEntry bedEntry = new ZipEntry("bed.bed");
 
         String saveFilePath = SaveLocation.getSaveFolderLocation() + "/mods/assets/" + structureID.namespace + "/structures/" + structureID.name + ".zip";
         File saveFile = new File(saveFilePath);
@@ -201,12 +220,17 @@ public class Structure {
             outputStream.putNextEntry(structureEntry);
             outputStream.write(palletizedBlockBytes.array());
             outputStream.closeEntry();
+            outputStream.putNextEntry(bedEntry);
+            outputStream.write(bedFile.readBytes());
+            outputStream.closeEntry();
             outputStream.close();
         }
         catch (IOException exception){
             output = exception.getMessage();
+            bedFile.delete();
             return false;
         }
+        bedFile.delete();
         output = "Structure saved successfully";
         return true;
     }
@@ -242,7 +266,7 @@ public class Structure {
                     int version = structureInfo.getInt("structureVersion");
                     newStructure.version = version;
                     switch (version) {
-                        case 1 -> {
+                        case 1, 2 -> {
                             newStructure.size.x = structureInfo.getInt("sizeX");
                             newStructure.size.y = structureInfo.getInt("sizeY");
                             newStructure.size.z = structureInfo.getInt("sizeZ");

@@ -10,12 +10,15 @@ import dev.crmodders.cosmicquilt.api.entrypoint.ModInitializer;
 import dev.crmodders.flux.api.v5.events.GameEvents;
 import dev.crmodders.flux.registry.FluxRegistries;
 import org.quiltmc.loader.api.ModContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.nern.becraft.bed.BlockEntityRegistries;
 import ru.nern.becraft.bed.utils.BEUtils;
 
 public class StructureBlocks implements ModInitializer {
 	public static final String MOD_ID = "structure_blocks";
-	public static final int STRUCTURE_SAVE_VERSION = 1;
+	public static final Logger LOGGER = LoggerFactory.getLogger("Structure Blocks");
+	public static final int STRUCTURE_SAVE_VERSION = 2;
 
 	@Override
 	public void onInitialize(ModContainer modContainer) {
