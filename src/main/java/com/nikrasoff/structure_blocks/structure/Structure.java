@@ -22,6 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -180,7 +181,14 @@ public class Structure {
             }
         }
 
-        FileHandle bedFile = BlockEntitySaver.saveBlockEntities(minPos, maxPos, SaveLocation.getSaveFolderLocation() + "temp.bed");
+        ArrayList<BlockPosition> bedExceptions = new ArrayList<>();
+        for (BlockReplaceRule i : replaceRules){
+            for (BlockPosition bp : i.replacePositions){
+                bedExceptions.add(bp);
+            }
+        }
+
+        FileHandle bedFile = BlockEntitySaver.saveBlockEntities(minPos, maxPos, SaveLocation.getSaveFolderLocation() + "temp.bed", bedExceptions.toArray(new BlockPosition[]{}));
 
         JsonValue structureInfo = new JsonValue(JsonValue.ValueType.object);
         structureInfo.addChild("structureVersion", new JsonValue(StructureBlocks.STRUCTURE_SAVE_VERSION));
