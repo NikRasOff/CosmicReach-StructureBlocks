@@ -10,15 +10,14 @@
 
     "metadata": {
       "name": "Structure Blocks",
-      "description": "A mod that allows you to save/place structures. Might be useful.",
+      "description": "A mod that allows you to save/place structures. \nMight be useful.",
       "contributors": {
         "NikRasOff": "Owner"
       },
 
       "contact": {
-        "homepage": "https://example.com/",
-        "issues": "https://codeberg.org/CRModders/cosmic-quilt-example/issues",
-        "sources": "https://codeberg.org/CRModders/cosmic-quilt-example"
+        "issues": "https://github.com/NikRasOff/CosmicReach-StructureBlocks/issues",
+        "sources": "https://github.com/NikRasOff/CosmicReach-StructureBlocks"
       },
 
       "icon": "assets/structure_blocks/icon.png"
