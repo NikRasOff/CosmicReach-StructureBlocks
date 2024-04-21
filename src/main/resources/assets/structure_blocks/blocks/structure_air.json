@@ -1,0 +1,13 @@
+{
+    "stringId": "structure_blocks:structure_air",
+    "blockStates":
+    {
+        "default": 
+        {
+            "modelName": "structure_blocks:model_structure_air",
+            "isOpaque": false,
+            "isTransparent": true,
+            "lightAttenuation": 0
+        }
+    }
+}

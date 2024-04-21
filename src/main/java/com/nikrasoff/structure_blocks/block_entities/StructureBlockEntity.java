@@ -20,10 +20,11 @@ public class StructureBlockEntity extends BlockEntity {
     public static StructureBlockLoadMenu STRUCTURE_LOAD_MENU;
     public static ConfirmWindow CONFIRM_WINDOW;
     public IntVector3 offset = new IntVector3();
-    public IntVector3 size = new IntVector3(1, 1, 1);
+    public IntVector3 size = new IntVector3();
     public String replaceWith = "base:air[default]";
     public String structureId = "structure_blocks:example/house_small";
     public boolean saveMode = true;
+    public boolean airToVoid = false;
 
     public Structure currentStructure;
     public String structureOutput = "";
@@ -45,6 +46,7 @@ public class StructureBlockEntity extends BlockEntity {
         compound.putString("replaceWith", this.replaceWith);
         compound.putString("structureId", this.structureId);
         compound.putBoolean("saveMode", this.saveMode);
+        compound.putBoolean("airToVoid", this.airToVoid);
         return compound;
     }
 
@@ -60,6 +62,7 @@ public class StructureBlockEntity extends BlockEntity {
         this.replaceWith = compound.getString("replaceWith");
         this.structureId = compound.getString("structureId");
         this.saveMode = compound.getBoolean("saveMode");
+        this.airToVoid = compound.getBoolean("airToVoid");
     }
 
     public void loadStructure(){

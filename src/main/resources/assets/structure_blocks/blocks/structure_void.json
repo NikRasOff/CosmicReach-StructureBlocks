@@ -1,0 +1,13 @@
+{
+    "stringId": "structure_blocks:structure_void",
+    "blockStates":
+    {
+        "default": 
+        {
+            "modelName": "structure_blocks:model_void",
+            "isOpaque": false,
+            "isTransparent": true,
+            "lightAttenuation": 0
+        }
+    }
+}

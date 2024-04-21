@@ -1,0 +1,12 @@
+{
+    "parent": "cube",
+
+    "textures":
+    {
+        "all":
+        {
+            "fileName": "structure_blocks:structure_air.png"
+        }
+    }
+    
+}

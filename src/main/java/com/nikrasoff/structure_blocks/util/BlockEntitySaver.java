@@ -21,12 +21,10 @@ import ru.nern.becraft.bed.utils.BEUtils;
 import ru.nern.becraft.bed.utils.DataFixerUtil;
 
 import java.io.IOException;
-import java.util.Arrays;
-
 public class BlockEntitySaver {
     private static final CompoundTag saveCompound = new CompoundTag();
 
-    static public FileHandle saveBlockEntities(IntVector3 pos1, IntVector3 pos2, String filePath, BlockPosition... exceptions){
+    static public FileHandle saveBlockEntities(IntVector3 pos1, IntVector3 pos2, String filePath){
         IntVector3 minPos = IntVector3.lesserVector(pos1, pos2);
         IntVector3 maxPos = IntVector3.greaterVector(pos1, pos2);
 
@@ -36,15 +34,17 @@ public class BlockEntitySaver {
             for (int y = minPos.y; y < maxPos.y; ++y){
                 for (int z = minPos.z; z < maxPos.z; ++z){
                     BlockPosition curBlockPos = BlockPositionUtil.getBlockPositionAtGlobalPos(x, y, z);
-                    if (Arrays.asList(exceptions).contains(curBlockPos)) continue;
                     BlockEntity blockEntity = BEUtils.getBlockEntity(curBlockPos);
-                    if (blockEntity != null){
-                        CompoundTag entityCompond = blockEntity.writeData(new CompoundTag());
-                        entityCompond.putInt("localX", x - minPos.x);
-                        entityCompond.putInt("localY", y - minPos.y);
-                        entityCompond.putInt("localZ", z - minPos.z);
-                        areaBlockEntityRoot.add(entityCompond);
-                    }
+
+                    if (blockEntity == null) continue;
+
+                    if (!blockEntity.getType().isBlockSupported(curBlockPos.getBlockState().getBlockId())) continue;
+
+                    CompoundTag entityCompond = blockEntity.writeData(new CompoundTag());
+                    entityCompond.putInt("localX", x - minPos.x);
+                    entityCompond.putInt("localY", y - minPos.y);
+                    entityCompond.putInt("localZ", z - minPos.z);
+                    areaBlockEntityRoot.add(entityCompond);
                 }
             }
         }

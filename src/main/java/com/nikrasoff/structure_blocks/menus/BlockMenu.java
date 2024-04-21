@@ -3,6 +3,7 @@ package com.nikrasoff.structure_blocks.menus;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.nikrasoff.structure_blocks.util.FixedTextBoxElement;
+import com.nikrasoff.structure_blocks.util.FixedToggleElement;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextElement;
 import dev.crmodders.flux.menus.BasicMenu;
@@ -64,6 +65,14 @@ public class BlockMenu extends BasicMenu {
             this.copyToEntity();
             switchFromThisState(this.previousState);
         }
+    }
+
+    protected FixedToggleElement createToggle(float x, float y, float w, float h, boolean defaultValue){
+        FixedToggleElement newToggle = new FixedToggleElement(defaultValue);
+        newToggle.setAnchors(HorizontalAnchor.LEFT_ALIGNED, VerticalAnchor.TOP_ALIGNED);
+        newToggle.setBounds(x, y, w, h);
+        this.addFluxElement(newToggle);
+        return newToggle;
     }
 
     protected ButtonElement createButton(float x, float y, float w, float h, Runnable action, String text){

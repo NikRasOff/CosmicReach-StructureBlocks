@@ -2,6 +2,7 @@ package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.structure.Structure;
+import com.nikrasoff.structure_blocks.util.FixedToggleElement;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextBoxElement;
@@ -13,6 +14,8 @@ import finalforeach.cosmicreach.ui.VerticalAnchor;
 public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
     private final TextBoxElement[] sizeInput;
     private final TextBoxElement replaceWithInput;
+
+    private final FixedToggleElement airToVoidInput;
 
     public StructureBlockSaveMenu(){
         super();
@@ -31,6 +34,9 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
 
         this.createLabel(15, 310, 250, 50, "Replace with:");
         this.replaceWithInput = this.createTextInput(280, 310, 500, 50, "", "base:cheese[default]");
+
+        this.createLabel(15, 370, 250, 50, "Convert air to void?");
+        this.airToVoidInput = this.createToggle(280, 370, 250, 50, false);
 
         ButtonElement saveButton = this.createButton(260, -15, 250, 50, this::onSave, "Save structure");
         saveButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED);
@@ -72,6 +78,8 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
 
         this.replaceWithInput.setContent(entity.replaceWith);
         this.replaceWithInput.updateText();
+        this.airToVoidInput.value = entity.airToVoid;
+        this.airToVoidInput.updateText();
     }
 
     @Override
@@ -100,5 +108,6 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
         }
 
         entity.replaceWith = this.replaceWithInput.getContent();
+        entity.airToVoid = this.airToVoidInput.value;
     }
 }

@@ -5,12 +5,15 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.nikrasoff.structure_blocks.StructureBlocks;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
+import com.nikrasoff.structure_blocks.structure.block_replacements.BlockReplacementFull;
+import com.nikrasoff.structure_blocks.structure.rules.*;
 import com.nikrasoff.structure_blocks.util.BlockEntitySaver;
 import com.nikrasoff.structure_blocks.util.IntVector3;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.tags.Identifier;
 import dev.crmodders.flux.util.BlockPositionUtil;
 import finalforeach.cosmicreach.GameAssetLoader;
+import finalforeach.cosmicreach.blocks.Block;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.blocks.BlockState;
 import finalforeach.cosmicreach.gamestates.InGame;
@@ -107,7 +110,10 @@ public class Structure {
 
                         int blockId = buffer.getInt();
                         Vector3 globalPos = origin.cpy().add(offset).toVector3();
-                        BlockSetter.replaceBlock(zone, blockStatePalette.get(blockId), BlockPositionUtil.getBlockPositionAtGlobalPos(globalPos), new Queue<>());
+                        BlockState blockState = blockStatePalette.get(blockId);
+                        if (blockState != StructureBlocks.STRUCTURE_VOID){
+                            BlockSetter.replaceBlock(zone, blockState, BlockPositionUtil.getBlockPositionAtGlobalPos(globalPos), new Queue<>());
+                        }
                         offset.x += 1;
                     }
                 }
@@ -144,10 +150,19 @@ public class Structure {
         IntVector3 pos1 = new IntVector3(entityPos.getGlobalX(), entityPos.getGlobalY(), entityPos.getGlobalZ()).add(entity.offset);
         IntVector3 pos2 = pos1.cpy().add(entity.size);
 
-        saveStructure(pos1, pos2, entity.getZone().zoneId, Identifier.fromString(entity.structureId), new BlockReplaceRule(BlockState.getInstance(entity.replaceWith), entityPos));
+        BlockReplaceRuleset ruleset = new BlockReplaceRuleset();
+        ruleset.add(new BlockReplaceRulePosition(new BlockReplacementFull(BlockState.getInstance(entity.replaceWith)), entityPos));
+
+        if (entity.airToVoid){
+            ruleset.add(new BlockReplaceRuleBlock(new BlockReplacementFull(StructureBlocks.STRUCTURE_VOID), Block.getInstance("block_air")));
+        }
+
+        ruleset.add(new BlockReplaceRuleBlockState(new BlockReplacementFull(Block.AIR.getDefaultBlockState()), StructureBlocks.STRUCTURE_AIR));
+
+        saveStructure(pos1, pos2, entity.getZone().zoneId, Identifier.fromString(entity.structureId), ruleset);
     }
 
-    public static boolean saveStructure(IntVector3 pos1, IntVector3 pos2, String zoneID, Identifier structureID, BlockReplaceRule... replaceRules){
+    public static boolean saveStructure(IntVector3 pos1, IntVector3 pos2, String zoneID, Identifier structureID, BlockReplaceRuleset ruleset){
         // A lot of this is taken from/inspired by Cosmatica
 
         IntVector3 minPos = IntVector3.lesserVector(pos1, pos2);
@@ -159,15 +174,7 @@ public class Structure {
             for (int y = minPos.y; y < maxPos.y; ++y){
                 for (int x = minPos.x; x < maxPos.x; ++x){
                     BlockState blockState = InGame.world.getZone(zoneID).getBlockState(x, y, z);
-                    for (BlockReplaceRule brr : replaceRules){
-                        BlockPosition blockPos = BlockPositionUtil.getBlockPositionAtGlobalPos(x, y, z);
-                        for (BlockPosition bp : brr.replacePositions){
-                            if (blockPos.equals(bp)) {
-                                blockState = brr.replaceWithBlock;
-                                break;
-                            }
-                        }
-                    }
+                    blockState = ruleset.checkRules(blockState, BlockPositionUtil.getBlockPositionAtGlobalPos(x, y, z));
                     String blockStateString = blockState.toString();
                     int index = seenBlockStateStrings.indexOf(blockStateString, false);
 
@@ -181,14 +188,7 @@ public class Structure {
             }
         }
 
-        ArrayList<BlockPosition> bedExceptions = new ArrayList<>();
-        for (BlockReplaceRule i : replaceRules){
-            for (BlockPosition bp : i.replacePositions){
-                bedExceptions.add(bp);
-            }
-        }
-
-        FileHandle bedFile = BlockEntitySaver.saveBlockEntities(minPos, maxPos, SaveLocation.getSaveFolderLocation() + "temp.bed", bedExceptions.toArray(new BlockPosition[]{}));
+        FileHandle bedFile = BlockEntitySaver.saveBlockEntities(minPos, maxPos, SaveLocation.getSaveFolderLocation() + "temp.bed");
 
         JsonValue structureInfo = new JsonValue(JsonValue.ValueType.object);
         structureInfo.addChild("structureVersion", new JsonValue(StructureBlocks.STRUCTURE_SAVE_VERSION));
@@ -300,14 +300,5 @@ public class Structure {
         }
         output = "Error";
         return null;
-    }
-
-    public static class BlockReplaceRule{
-        public BlockPosition[] replacePositions;
-        public BlockState replaceWithBlock;
-        public BlockReplaceRule(BlockState replaceBlock, BlockPosition... replaceAt){
-            this.replacePositions = replaceAt;
-            this.replaceWithBlock = replaceBlock;
-        }
     }
 }

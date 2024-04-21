@@ -16,10 +16,10 @@ public abstract class BaseStructureBlockMenu extends BlockMenu {
     public final TextBoxElement structureIDInput;
 
     public BaseStructureBlockMenu(){
-        this.blockOutputLabel = this.createLabel(15, -130, 250, 50, "Structure Block output: ");
+        this.blockOutputLabel = this.createLabel(15, -120, 250, 50, "Structure Block output: ");
         this.blockOutputLabel.setAnchors(HorizontalAnchor.LEFT_ALIGNED, VerticalAnchor.BOTTOM_ALIGNED);
 
-        this.blockOutput = this.createLabel(280, -130, 500, 50, "");
+        this.blockOutput = this.createLabel(280, -120, 500, 50, "");
         this.blockOutput.backgroundEnabled = true;
         this.blockOutput.setAnchors(HorizontalAnchor.LEFT_ALIGNED, VerticalAnchor.BOTTOM_ALIGNED);
 
