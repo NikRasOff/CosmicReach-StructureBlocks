@@ -1,11 +1,11 @@
 package com.nikrasoff.structure_blocks;
 
+import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockRenderer;
+import com.nikrasoff.structure_blocks.blocks.JigsawBlock;
 import com.nikrasoff.structure_blocks.blocks.StructureBlock;
-import com.nikrasoff.structure_blocks.menus.ConfirmWindow;
-import com.nikrasoff.structure_blocks.menus.StructureBlockLoadMenu;
-import com.nikrasoff.structure_blocks.menus.StructureBlockSaveMenu;
+import com.nikrasoff.structure_blocks.menus.*;
 import dev.crmodders.cosmicquilt.api.entrypoint.ModInitializer;
 import dev.crmodders.flux.api.v5.events.GameEvents;
 import dev.crmodders.flux.api.v5.generators.BlockGenerator;
@@ -19,6 +19,7 @@ import ru.nern.becraft.bed.BlockEntityRegistries;
 import ru.nern.becraft.bed.utils.BEUtils;
 
 public class StructureBlocks implements ModInitializer {
+	public static ConfirmWindow CONFIRM_WINDOW;
 	public static final String MOD_ID = "structure_blocks";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Structure Blocks");
 	public static final int STRUCTURE_SAVE_VERSION = 2;
@@ -31,6 +32,7 @@ public class StructureBlocks implements ModInitializer {
 		System.out.println("Initialising Structure Blocks!");
 
 		FluxRegistries.BLOCKS.register(StructureBlock.IDENTIFIER, new StructureBlock());
+		FluxRegistries.BLOCKS.register(JigsawBlock.IDENTIFIER, new JigsawBlock());
 		String[] blockIds = {
 				"structure_void",
 				"structure_air"
@@ -40,13 +42,14 @@ public class StructureBlocks implements ModInitializer {
 		}
 
 		BlockEntityRegistries.register(StructureBlockEntity.BE_TYPE);
+		BlockEntityRegistries.register(JigsawBlockEntity.BE_TYPE);
 
 		GameEvents.ON_POST_INIT.register(() -> {
+			CONFIRM_WINDOW = new ConfirmWindow();
 			STRUCTURE_VOID = BlockState.getInstance("structure_blocks:structure_void[default]");
 			STRUCTURE_AIR = BlockState.getInstance("structure_blocks:structure_air[default]");
-			StructureBlockEntity.STRUCTURE_SAVE_MENU = new StructureBlockSaveMenu();
-			StructureBlockEntity.STRUCTURE_LOAD_MENU = new StructureBlockLoadMenu();
-			StructureBlockEntity.CONFIRM_WINDOW = new ConfirmWindow();
+			StructureBlockEntity.blockMenus = new StructureBlockMenuCollection();
+			JigsawBlockEntity.blockMenus = new JigsawBlockMenuCollection();
 			BEUtils.renderDispatcher.registerRender(StructureBlockEntity.BE_TYPE, new StructureBlockRenderer());
 		});
 	}

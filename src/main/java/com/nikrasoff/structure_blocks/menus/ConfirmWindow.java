@@ -6,8 +6,8 @@ import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;
 import ru.nern.becraft.bed.api.BlockEntity;
 
-public class ConfirmWindow extends BlockMenu{
-    private TextElement confirmMessage;
+public class ConfirmWindow extends IngameBackgroundMenu{
+    private final TextElement confirmMessage;
     private ButtonElement cancelButton;
     private ButtonElement confirmButton;
     public ConfirmWindow(){
@@ -37,8 +37,12 @@ public class ConfirmWindow extends BlockMenu{
         this.confirmButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.CENTERED);
     }
 
-    public void switchToThisState(BlockEntity entity, String message, Runnable onConfirm, Runnable onCancel) {
-        super.switchToThisState(entity);
+    public void closeConfirmWindow(){
+        this.onBack();
+    }
+
+    public void switchToThisState(String message, Runnable onConfirm, Runnable onCancel) {
+        super.switchToThisState();
         this.confirmMessage.text = message;
         this.confirmMessage.updateText();
 

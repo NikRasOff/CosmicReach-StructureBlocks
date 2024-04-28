@@ -8,7 +8,7 @@ import dev.crmodders.flux.api.v5.gui.TextElement;
 import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;
 
-public abstract class BaseStructureBlockMenu extends BlockMenu {
+public abstract class BaseStructureBlockMenu extends BlockEntityMenu<StructureBlockEntity> {
     protected TextElement blockOutputLabel;
     protected TextElement blockOutput;
 
@@ -56,49 +56,45 @@ public abstract class BaseStructureBlockMenu extends BlockMenu {
 
     @Override
     protected void copyFromEntity() {
-        super.copyFromEntity();
-        StructureBlockEntity entity = (StructureBlockEntity) this.reflectedEntity;
-        if (entity == null) return;
+        if (this.reflectedEntity == null) return;
 
-        this.outputInfo(entity.structureOutput);
+        this.outputInfo(this.reflectedEntity.structureOutput);
 
-        this.offsetInput[0].setContent(String.valueOf(entity.offset.x));
+        this.offsetInput[0].setContent(String.valueOf(this.reflectedEntity.offset.x));
         this.offsetInput[0].updateText();
-        this.offsetInput[1].setContent(String.valueOf(entity.offset.y));
+        this.offsetInput[1].setContent(String.valueOf(this.reflectedEntity.offset.y));
         this.offsetInput[1].updateText();
-        this.offsetInput[2].setContent(String.valueOf(entity.offset.z));
+        this.offsetInput[2].setContent(String.valueOf(this.reflectedEntity.offset.z));
         this.offsetInput[2].updateText();
 
-        this.structureIDInput.setContent(entity.structureId);
+        this.structureIDInput.setContent(this.reflectedEntity.structureId);
         this.structureIDInput.updateText();
     }
 
     @Override
     protected void copyToEntity() {
-        super.copyToEntity();
-        StructureBlockEntity entity = (StructureBlockEntity) this.reflectedEntity;
-        if (entity == null) return;
+        if (this.reflectedEntity == null) return;
 
         if (StructureUtils.isValidInt(this.offsetInput[0].getContent())){
-            entity.offset.x = Integer.parseInt(this.offsetInput[0].getContent());
+            this.reflectedEntity.offset.x = Integer.parseInt(this.offsetInput[0].getContent());
         }
         else {
             System.out.println(this.offsetInput[0].getContent());
             this.outputInfo("Offset X: \"" + this.offsetInput[0].getContent() + "\" is not a valid integer");
         }
         if (StructureUtils.isValidInt(this.offsetInput[1].getContent())){
-            entity.offset.y = Integer.parseInt(this.offsetInput[1].getContent());
+            this.reflectedEntity.offset.y = Integer.parseInt(this.offsetInput[1].getContent());
         }
         else {
             this.outputInfo("Offset Y: \"" + this.offsetInput[1].getContent() + "\" is not a valid integer");
         }
         if (StructureUtils.isValidInt(this.offsetInput[2].getContent())){
-            entity.offset.z = Integer.parseInt(this.offsetInput[2].getContent());
+            this.reflectedEntity.offset.z = Integer.parseInt(this.offsetInput[2].getContent());
         }
         else {
             this.outputInfo("Offset Z: \"" + this.offsetInput[2].getContent() + "\" is not a valid integer");
         }
 
-        entity.structureId = this.structureIDInput.getContent();
+        this.reflectedEntity.structureId = this.structureIDInput.getContent();
     }
 }
