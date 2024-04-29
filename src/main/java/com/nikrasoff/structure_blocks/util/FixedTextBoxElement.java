@@ -3,7 +3,7 @@ package com.nikrasoff.structure_blocks.util;
 import dev.crmodders.flux.api.v5.gui.TextBoxElement;
 
 public class FixedTextBoxElement extends TextBoxElement {
-    private static FixedTextBoxElement currentTextBoxElement;
+    protected static FixedTextBoxElement currentTextBoxElement;
 
     public FixedTextBoxElement(){
     }
@@ -21,6 +21,10 @@ public class FixedTextBoxElement extends TextBoxElement {
     public void deactivate() {
         if (currentTextBoxElement != this) return;
         currentTextBoxElement = null;
+        this.onDeactivate();
         super.deactivate();
+    }
+
+    public void onDeactivate(){
     }
 }
