@@ -1,8 +1,8 @@
 package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
-import com.nikrasoff.structure_blocks.util.BetterIntSlider;
-import com.nikrasoff.structure_blocks.util.FixedTextBoxElement;
+import com.nikrasoff.structure_blocks.menus.elements.BetterIntSlider;
+import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextElement;

@@ -1,7 +1,7 @@
 package com.nikrasoff.structure_blocks.block_entities;
 
 import com.nikrasoff.structure_blocks.blocks.JigsawBlock;
-import com.nikrasoff.structure_blocks.menus.BlockMenuCollection;
+import com.nikrasoff.structure_blocks.menus.collections.BlockMenuCollection;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.world.Zone;

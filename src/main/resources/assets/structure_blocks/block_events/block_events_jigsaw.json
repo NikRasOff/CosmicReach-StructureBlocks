@@ -1,0 +1,23 @@
+{
+  "parent":"base:block_events_default",
+  "stringId": "structure_blocks:block_events_jigsaw",
+  "triggers":
+  {
+    "onPlace":
+    [
+      {
+        "actionId": "structure_blocks:face_away_from_player"
+      },
+      {
+        "actionId": "base:play_sound_2d",
+        "parameters":
+        {
+          "sound": "block-place.ogg",
+          "volume": 1,
+          "pitch": 1,
+          "pan": 0
+        }
+      }
+    ]
+  }
+}

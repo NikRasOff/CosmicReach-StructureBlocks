@@ -1,10 +1,45 @@
 {
     "stringId": "structure_blocks:jigsaw_block",
+    "defaultParams":
+    {
+        "facing": "posZ"
+    },
     "blockStates":
     {
-        "default": 
+        "facing=posZ":
         {
-            "modelName": "structure_blocks:model_jigsaw"
+            "modelName": "structure_blocks:model_jigsaw_posZ",
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
+        },
+        "facing=negZ":
+        {
+            "modelName": "structure_blocks:model_jigsaw_negZ",
+            "catalogHidden": true,
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
+        },
+        "facing=posX":
+        {
+            "modelName": "structure_blocks:model_jigsaw_posX",
+            "catalogHidden": true,
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
+        },
+        "facing=negX":
+        {
+            "modelName": "structure_blocks:model_jigsaw_negX",
+            "catalogHidden": true,
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
+        },
+        "facing=posY":
+        {
+            "modelName": "structure_blocks:model_jigsaw_posY",
+            "catalogHidden": true,
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
+        },
+        "facing=negY":
+        {
+            "modelName": "structure_blocks:model_jigsaw_negY",
+            "catalogHidden": true,
+            "blockEventsId": "structure_blocks:block_events_jigsaw"
         }
     }
 }

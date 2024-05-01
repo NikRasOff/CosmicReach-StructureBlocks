@@ -1,10 +1,7 @@
 package com.nikrasoff.structure_blocks.block_entities;
 
 import com.nikrasoff.structure_blocks.blocks.StructureBlock;
-import com.nikrasoff.structure_blocks.menus.BlockMenuCollection;
-import com.nikrasoff.structure_blocks.menus.ConfirmWindow;
-import com.nikrasoff.structure_blocks.menus.StructureBlockLoadMenu;
-import com.nikrasoff.structure_blocks.menus.StructureBlockSaveMenu;
+import com.nikrasoff.structure_blocks.menus.collections.BlockMenuCollection;
 import com.nikrasoff.structure_blocks.structure.Structure;
 import com.nikrasoff.structure_blocks.util.IntVector3;
 import dev.crmodders.flux.tags.Identifier;

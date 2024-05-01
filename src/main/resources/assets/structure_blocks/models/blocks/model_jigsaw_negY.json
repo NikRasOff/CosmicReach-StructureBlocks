@@ -1,0 +1,18 @@
+{
+    "parent": "cube",
+
+    "textures":
+    {
+        "top":
+        {
+            "fileName": "structure_blocks:jigsaw_block_back.png"
+        },
+        "side": {
+            "fileName": "structure_blocks:jigsaw_block_side_down.png"
+        },
+        "bottom": {
+            "fileName": "structure_blocks:jigsaw_block.png"
+        }
+    }
+
+}

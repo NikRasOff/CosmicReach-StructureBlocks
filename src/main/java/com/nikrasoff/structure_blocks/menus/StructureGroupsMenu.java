@@ -1,7 +1,7 @@
 package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.structure.StructureGroup;
-import com.nikrasoff.structure_blocks.util.FixedTextBoxElement;
+import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.menus.BasicMenu;
 import dev.crmodders.flux.tags.Identifier;

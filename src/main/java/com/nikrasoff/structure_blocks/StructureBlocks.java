@@ -3,16 +3,19 @@ package com.nikrasoff.structure_blocks;
 import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockRenderer;
+import com.nikrasoff.structure_blocks.block_events.BlockActionFaceAwayFromPlayer;
 import com.nikrasoff.structure_blocks.blocks.JigsawBlock;
 import com.nikrasoff.structure_blocks.blocks.StructureBlock;
 import com.nikrasoff.structure_blocks.menus.*;
+import com.nikrasoff.structure_blocks.menus.collections.JigsawBlockMenuCollection;
+import com.nikrasoff.structure_blocks.menus.collections.StructureBlockMenuCollection;
 import com.nikrasoff.structure_blocks.structure.Structure;
-import com.nikrasoff.structure_blocks.structure.StructureGroup;
 import dev.crmodders.cosmicquilt.api.entrypoint.ModInitializer;
 import dev.crmodders.flux.api.v5.events.GameEvents;
 import dev.crmodders.flux.api.v5.generators.BlockGenerator;
 import dev.crmodders.flux.registry.FluxRegistries;
 import dev.crmodders.flux.tags.Identifier;
+import finalforeach.cosmicreach.blockevents.BlockEvents;
 import finalforeach.cosmicreach.blocks.BlockState;
 import org.quiltmc.loader.api.ModContainer;
 import org.slf4j.Logger;
@@ -48,6 +51,7 @@ public class StructureBlocks implements ModInitializer {
 			StructureBlocksRegistries.STRUCTURES.register(structureID, Structure.loadStructure(structureID));
 		}
 
+		BlockEvents.registerBlockEventAction(BlockActionFaceAwayFromPlayer.class);
 
 		FluxRegistries.BLOCKS.register(StructureBlock.IDENTIFIER, new StructureBlock());
 		FluxRegistries.BLOCKS.register(JigsawBlock.IDENTIFIER, new JigsawBlock());

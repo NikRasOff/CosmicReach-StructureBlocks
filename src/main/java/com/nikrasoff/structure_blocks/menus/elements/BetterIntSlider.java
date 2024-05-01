@@ -1,4 +1,4 @@
-package com.nikrasoff.structure_blocks.util;
+package com.nikrasoff.structure_blocks.menus.elements;
 
 import dev.crmodders.flux.api.v5.gui.base.BaseSlider;
 

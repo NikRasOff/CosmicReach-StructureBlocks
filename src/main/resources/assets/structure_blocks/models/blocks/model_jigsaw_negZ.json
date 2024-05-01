@@ -1,0 +1,42 @@
+{
+  "cuboids":
+  [
+    {
+      "localBounds": [0,0,0, 16,16,16],
+      "faces":
+      {
+        "localNegX": {"uv": [ 0, 0, 16, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "side_left"},
+        "localPosX": {"uv": [ 0, 0, 16, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "side_right"},
+
+        "localNegY": {"uv": [ 0, 0, 16, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "side_down"},
+        "localPosY": {"uv": [ 0, 0, 16, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "side_up"},
+
+        "localNegZ": {"uv": [ 16, 0, 0, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "front"},
+        "localPosZ": {"uv": [ 0, 0, 16, 16 ], "ambientocclusion": true, "cullFace": true, "texture": "back"}
+      }
+    }
+  ],
+
+  "textures":
+  {
+    "front":
+    {
+      "fileName": "structure_blocks:jigsaw_block.png"
+    },
+    "side_up": {
+      "fileName": "structure_blocks:jigsaw_block_side_up.png"
+    },
+    "side_down": {
+      "fileName": "structure_blocks:jigsaw_block_side_down.png"
+    },
+    "side_right": {
+      "fileName": "structure_blocks:jigsaw_block_side_right.png"
+    },
+    "side_left": {
+      "fileName": "structure_blocks:jigsaw_block_side_left.png"
+    },
+    "back": {
+      "fileName": "structure_blocks:jigsaw_block_back.png"
+    }
+  }
+}

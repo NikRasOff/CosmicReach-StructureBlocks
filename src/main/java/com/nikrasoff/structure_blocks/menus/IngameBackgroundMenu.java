@@ -2,9 +2,9 @@ package com.nikrasoff.structure_blocks.menus;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.nikrasoff.structure_blocks.util.BetterIntSlider;
-import com.nikrasoff.structure_blocks.util.FixedTextBoxElement;
-import com.nikrasoff.structure_blocks.util.FixedToggleElement;
+import com.nikrasoff.structure_blocks.menus.elements.BetterIntSlider;
+import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
+import com.nikrasoff.structure_blocks.menus.elements.FixedToggleElement;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextElement;
 import dev.crmodders.flux.menus.BasicMenu;

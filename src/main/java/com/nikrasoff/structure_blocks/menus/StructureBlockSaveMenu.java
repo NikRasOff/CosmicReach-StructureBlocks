@@ -1,14 +1,12 @@
 package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.StructureBlocks;
-import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.structure.Structure;
-import com.nikrasoff.structure_blocks.util.FixedToggleElement;
+import com.nikrasoff.structure_blocks.menus.elements.FixedToggleElement;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextBoxElement;
-import dev.crmodders.flux.api.v5.gui.TextElement;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;

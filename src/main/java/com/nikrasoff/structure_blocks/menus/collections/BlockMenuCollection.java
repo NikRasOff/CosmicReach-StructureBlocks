@@ -1,6 +1,7 @@
-package com.nikrasoff.structure_blocks.menus;
+package com.nikrasoff.structure_blocks.menus.collections;
 
 import com.badlogic.gdx.utils.OrderedMap;
+import com.nikrasoff.structure_blocks.menus.BlockMenu;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.gamestates.GameState;
 import ru.nern.becraft.bed.api.BlockEntity;

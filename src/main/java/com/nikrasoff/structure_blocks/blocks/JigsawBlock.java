@@ -1,7 +1,6 @@
 package com.nikrasoff.structure_blocks.blocks;
 
 import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
-import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import dev.crmodders.flux.api.v5.generators.BlockGenerator;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.blocks.BlockPosition;
