@@ -6,6 +6,7 @@ import com.nikrasoff.structure_blocks.util.ButtonTextBox;
 import com.nikrasoff.structure_blocks.util.FixedTextBoxElement;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
+import dev.crmodders.flux.api.v5.gui.TextElement;
 import dev.crmodders.flux.menus.ScrollMenu;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.gamestates.GameState;
@@ -22,6 +23,12 @@ public class StructureGroupEditMenu extends ScrollMenu {
     public StructureGroupEditMenu(StructureGroup group, GameState prevGameState){
         super(prevGameState);
         this.editedGroup = group;
+
+        TextElement groupIDDisplay = new TextElement(group.idString);
+        groupIDDisplay.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
+        groupIDDisplay.setBounds(0, 0, 250, 50);
+        groupIDDisplay.backgroundEnabled = false;
+        this.addFluxElement(groupIDDisplay);
 
         ButtonElement deleteButton = new ButtonElement(() -> this.markedForDeletion = true);
         deleteButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED);
@@ -44,14 +51,14 @@ public class StructureGroupEditMenu extends ScrollMenu {
             this.onEscape();
         });
         saveChangesButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
-        saveChangesButton.setBounds(130, 10, 250, 50);
+        saveChangesButton.setBounds(130, 50, 250, 50);
         saveChangesButton.text = "Save Changes";
         saveChangesButton.updateText();
         this.addFluxElement(saveChangesButton);
 
         ButtonElement cancelButton = new ButtonElement(this::onEscape);
         cancelButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
-        cancelButton.setBounds(-130, 10, 250, 50);
+        cancelButton.setBounds(-130, 50, 250, 50);
         cancelButton.text = "Cancel";
         cancelButton.updateText();
         this.addFluxElement(cancelButton);
@@ -87,12 +94,12 @@ public class StructureGroupEditMenu extends ScrollMenu {
         if (this.addButton.getContent().isEmpty()) return;
 
         Identifier newIdentifier = Identifier.fromString(this.addButton.getContent());
-        if (this.editedGroup.hasStructure(newIdentifier)) return;
+        if (this.editedGroup.hasStructure(newIdentifier.toString())) return;
 
-        Structure newStructure = Structure.loadStructure(newIdentifier);
+        Structure newStructure = Structure.getStructure(newIdentifier);
         if (newStructure == null) return;
 
-        StructureGroup.StructureGroupEntry newEntry = new StructureGroup.StructureGroupEntry(newStructure, 1);
+        StructureGroup.StructureGroupEntry newEntry = new StructureGroup.StructureGroupEntry(newIdentifier.toString(), 1);
         this.editedGroup.structures.add(newEntry);
 
         StructureDisplay newDisplay = new StructureDisplay(newEntry);
@@ -108,7 +115,7 @@ public class StructureGroupEditMenu extends ScrollMenu {
             this.trackedEntry = entry;
 
             this.setContent(String.valueOf(entry.weight));
-            this.label = entry.structure.id.toString() + " | Weight: ";
+            this.label = entry.structureID + " | Weight: ";
         }
 
         @Override

@@ -1,15 +1,19 @@
 package com.nikrasoff.structure_blocks.structure;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.nikrasoff.structure_blocks.StructureBlocks;
+import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.structure.block_replacements.BlockReplacementFull;
 import com.nikrasoff.structure_blocks.structure.rules.*;
 import com.nikrasoff.structure_blocks.util.BlockEntitySaver;
 import com.nikrasoff.structure_blocks.util.IntVector3;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
+import dev.crmodders.flux.api.v5.resource.AssetLoader;
+import dev.crmodders.flux.registry.registries.AccessableRegistry;
 import dev.crmodders.flux.tags.Identifier;
 import dev.crmodders.flux.util.BlockPositionUtil;
 import finalforeach.cosmicreach.GameAssetLoader;
@@ -25,40 +29,28 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class Structure {
-    public static String output = "";
+    private static final Map<Identifier, Structure> ALL_STRUCTURES = new HashMap<>();
     public IntVector3 size = new IntVector3(0, 0, 0);
-    public Identifier id = new Identifier(StructureBlocks.MOD_ID, "placeholder");
     public int version = 0;
+    private FileHandle assetFile;
 
     public Structure(){}
-
-    public static String getFileString(Identifier id){
-        return id.namespace + "/structures/" + id.name + ".zip";
-    }
-    public static String getAssetString(Identifier id){return id.namespace + ":structures/" + id.name + ".zip";}
 
     public boolean place(String zoneID, BlockPosition pos){
         Array<BlockState> blockStatePalette = new Array<>();
         Zone zone = InGame.world.getZone(zoneID);
         try {
-            FileHandle assetFile;
-            if (StructureUtils.isStructureDataMod(this.id)){
-                assetFile = GameAssetLoader.loadAsset(getFileString(this.id));
-            }
-            else {
-                assetFile = GameAssetLoader.loadAsset(getAssetString(this.id));
-            }
             ZipInputStream zipInputStream = new ZipInputStream(assetFile.read());
             ZipEntry entry = zipInputStream.getNextEntry();
 
-            if (version < 1 || version > 2) {
-                output = "Unsupported version";
+            if (version < 1 || version > 3) {
                 return false;
             }
             while (entry != null) {
@@ -136,13 +128,27 @@ public class Structure {
                 entry = zipInputStream.getNextEntry();
             }
             zipInputStream.close();
-            output = "Structure placed successfully";
             return true;
         }
         catch (IOException exception){
-            output = exception.getMessage();
             return false;
         }
+    }
+
+    public static boolean structureExists(Identifier structureID){
+        AccessableRegistry<Structure> modStructures = StructureBlocksRegistries.STRUCTURES.access();
+        if (modStructures.contains(structureID)){
+            return true;
+        }
+        return ALL_STRUCTURES.containsKey(structureID);
+    }
+
+    public static Structure getStructure(Identifier structureID){
+        AccessableRegistry<Structure> modStructures = StructureBlocksRegistries.STRUCTURES.access();
+        if (modStructures.contains(structureID)){
+            return modStructures.get(structureID);
+        }
+        return ALL_STRUCTURES.get(structureID);
     }
 
     public static void saveStructure(StructureBlockEntity entity){
@@ -196,6 +202,7 @@ public class Structure {
         structureInfo.addChild("sizeX", new JsonValue(maxPos.x));
         structureInfo.addChild("sizeY", new JsonValue(maxPos.y));
         structureInfo.addChild("sizeZ", new JsonValue(maxPos.z));
+        structureInfo.addChild("idString", new JsonValue(structureID.toString()));
 
         JsonValue blockStatesJsonArray = new JsonValue(JsonValue.ValueType.array);
         for (String blockStateString : seenBlockStateStrings){
@@ -213,7 +220,7 @@ public class Structure {
         ZipEntry structureEntry = new ZipEntry("structure");
         ZipEntry bedEntry = new ZipEntry("bed.bed");
 
-        String saveFilePath = SaveLocation.getSaveFolderLocation() + "/mods/assets/" + structureID.namespace + "/structures/" + structureID.name + ".zip";
+        String saveFilePath = SaveLocation.getSaveFolderLocation() + "/mods/assets/structures/" + structureID.toString().replaceAll(":", "/") + ".zip";
         File saveFile = new File(saveFilePath);
         saveFile.getParentFile().mkdirs();
 
@@ -234,33 +241,27 @@ public class Structure {
             outputStream.close();
         }
         catch (IOException exception){
-            output = exception.getMessage();
             bedFile.delete();
             return false;
         }
         bedFile.delete();
-        output = "Structure saved successfully";
+
+        loadStructure(new FileHandle(saveFile));
+
         return true;
     }
 
     public static Structure loadStructure(Identifier structureID){
-        if (!StructureUtils.structureExists(structureID)){
-            output = "Structure doesn't exist";
-            return null;
-        }
+        return loadStructure(GameAssetLoader.loadAsset("%s:structures/%s.zip".formatted(structureID.namespace, structureID.name)));
+    }
+
+    private static Structure loadStructure(FileHandle structureFile){
         try {
-            FileHandle assetFile;
-            if (StructureUtils.isStructureDataMod(structureID)){
-                assetFile = GameAssetLoader.loadAsset(getFileString(structureID));
-            }
-            else {
-                assetFile = GameAssetLoader.loadAsset(getAssetString(structureID));
-            }
-            ZipInputStream zipInputStream = new ZipInputStream(assetFile.read());
+            ZipInputStream zipInputStream = new ZipInputStream(structureFile.read());
             ZipEntry entry = zipInputStream.getNextEntry();
 
             Structure newStructure = new Structure();
-            newStructure.id = structureID;
+            newStructure.assetFile = structureFile;
 
             while (entry != null) {
                 if (entry.isDirectory()) continue;
@@ -268,25 +269,34 @@ public class Structure {
                 if (entry.getName().equalsIgnoreCase("structure_info.json")) {
                     JsonValue structureInfo = new JsonReader().parse(zipInputStream);
                     if (!structureInfo.has("structureVersion")) {
-                        output = "Missing version tag";
                         return null;
                     }
                     int version = structureInfo.getInt("structureVersion");
                     newStructure.version = version;
+
+                    Identifier newStructureID;
+
                     switch (version) {
+                        case 3 -> {
+                            newStructure.size.x = structureInfo.getInt("sizeX");
+                            newStructure.size.y = structureInfo.getInt("sizeY");
+                            newStructure.size.z = structureInfo.getInt("sizeZ");
+                            newStructureID = Identifier.fromString(structureInfo.getString("idString"));
+                        }
                         case 1, 2 -> {
                             newStructure.size.x = structureInfo.getInt("sizeX");
                             newStructure.size.y = structureInfo.getInt("sizeY");
                             newStructure.size.z = structureInfo.getInt("sizeZ");
+                            newStructureID = new Identifier("old", structureFile.nameWithoutExtension());
                         }
                         default -> {
-                            output = "Unsupported structure version";
                             return null;
                         }
                     }
 
+                    ALL_STRUCTURES.put(newStructureID, newStructure);
+
                     zipInputStream.close();
-                    output = "Loaded structure successfully";
                     return newStructure;
                 }
 
@@ -294,11 +304,17 @@ public class Structure {
             }
         }
         catch (IOException exception){
-            System.out.println(exception);
-            output = exception.toString();
             return null;
         }
-        output = "Error";
         return null;
+    }
+
+    static {
+        Array<FileHandle> structureFiles = StructureUtils.getAllFiles(Gdx.files.absolute(SaveLocation.getSaveFolderLocation() + "/mods/assets/structures"));
+        for (FileHandle f : structureFiles){
+            if (f.extension().equals("zip")){
+                loadStructure(f);
+            }
+        }
     }
 }

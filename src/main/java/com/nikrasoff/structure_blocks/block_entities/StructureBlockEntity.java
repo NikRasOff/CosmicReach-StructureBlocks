@@ -26,7 +26,6 @@ public class StructureBlockEntity extends BlockEntity {
     public boolean airToVoid = false;
 
     public Structure currentStructure;
-    public String structureOutput = "";
 
     public static BlockEntityType<StructureBlockEntity> BE_TYPE = new BlockEntityType<>(new Identifier(MOD_ID, "structure_block_entity"), StructureBlockEntity::new, StructureBlock.IDENTIFIER.toString());
     public StructureBlockEntity(Zone zone, BlockPosition blockPos) {
@@ -91,7 +90,7 @@ public class StructureBlockEntity extends BlockEntity {
     }
 
     public void loadStructure(){
-        this.currentStructure = Structure.loadStructure(Identifier.fromString(this.structureId));
+        this.currentStructure = Structure.getStructure(Identifier.fromString(this.structureId));
         if (this.currentStructure != null){
             this.size = this.currentStructure.size.cpy();
         }

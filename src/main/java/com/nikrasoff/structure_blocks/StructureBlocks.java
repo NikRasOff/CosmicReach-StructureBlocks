@@ -6,6 +6,8 @@ import com.nikrasoff.structure_blocks.block_entities.StructureBlockRenderer;
 import com.nikrasoff.structure_blocks.blocks.JigsawBlock;
 import com.nikrasoff.structure_blocks.blocks.StructureBlock;
 import com.nikrasoff.structure_blocks.menus.*;
+import com.nikrasoff.structure_blocks.structure.Structure;
+import com.nikrasoff.structure_blocks.structure.StructureGroup;
 import dev.crmodders.cosmicquilt.api.entrypoint.ModInitializer;
 import dev.crmodders.flux.api.v5.events.GameEvents;
 import dev.crmodders.flux.api.v5.generators.BlockGenerator;
@@ -22,7 +24,7 @@ public class StructureBlocks implements ModInitializer {
 	public static ConfirmWindow CONFIRM_WINDOW;
 	public static final String MOD_ID = "structure_blocks";
 	public static final Logger LOGGER = LoggerFactory.getLogger("Structure Blocks");
-	public static final int STRUCTURE_SAVE_VERSION = 2;
+	public static final int STRUCTURE_SAVE_VERSION = 3;
 
 	public static BlockState STRUCTURE_VOID;
 	public static BlockState STRUCTURE_AIR;
@@ -30,6 +32,22 @@ public class StructureBlocks implements ModInitializer {
 	@Override
 	public void onInitialize(ModContainer modContainer) {
 		System.out.println("Initialising Structure Blocks!");
+
+		String[] structureIDs = {
+				"example/house_small",
+				"nowhere:he/is/waiting"
+		};
+		for (String structure : structureIDs){
+			Identifier structureID;
+			if (structure.contains(":")){
+				structureID = Identifier.fromString(structure);
+			}
+			else{
+				structureID = new Identifier(MOD_ID, structure);
+			}
+			StructureBlocksRegistries.STRUCTURES.register(structureID, Structure.loadStructure(structureID));
+		}
+
 
 		FluxRegistries.BLOCKS.register(StructureBlock.IDENTIFIER, new StructureBlock());
 		FluxRegistries.BLOCKS.register(JigsawBlock.IDENTIFIER, new JigsawBlock());
@@ -43,6 +61,11 @@ public class StructureBlocks implements ModInitializer {
 
 		BlockEntityRegistries.register(StructureBlockEntity.BE_TYPE);
 		BlockEntityRegistries.register(JigsawBlockEntity.BE_TYPE);
+
+		GameEvents.ON_INIT.register(() -> {
+			StructureBlocksRegistries.STRUCTURES.freeze();
+			StructureBlocksRegistries.STRUCTURE_GROUPS.freeze();
+		});
 
 		GameEvents.ON_POST_INIT.register(() -> {
 			CONFIRM_WINDOW = new ConfirmWindow();

@@ -1,6 +1,7 @@
 package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.StructureBlocks;
+import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.structure.Structure;
 import com.nikrasoff.structure_blocks.util.FixedToggleElement;
@@ -22,7 +23,7 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
         super();
 
         this.createButton(280, 70, 250, 50, () -> {
-            StructureBlockEntity entity = (StructureBlockEntity) this.reflectedEntity;
+            StructureBlockEntity entity = this.reflectedEntity;
             entity.structureBlockMode = 1;
             this.copyToEntity();
             this.collection.switchToMenu("load");
@@ -45,7 +46,7 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
     protected void onSave() {
         this.copyToEntity();
         Identifier structureID = Identifier.fromString(this.structureIDInput.getContent());
-        if (StructureUtils.structureExists(structureID)){
+        if (Structure.structureExists(structureID)){
             ConfirmWindow window = StructureBlocks.CONFIRM_WINDOW;
             window.switchToThisState("Structure already exists. Overwrite?", () -> {
                 window.closeConfirmWindow();
@@ -58,8 +59,7 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
     }
 
     protected void saveStructure(){
-        Structure.saveStructure((StructureBlockEntity) this.reflectedEntity);
-        this.outputInfo(Structure.output);
+        Structure.saveStructure(this.reflectedEntity);
     }
 
     @Override
@@ -88,20 +88,11 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
         if (StructureUtils.isValidInt(this.sizeInput[0].getContent())){
             this.reflectedEntity.size.x = Integer.parseInt(this.sizeInput[0].getContent());
         }
-        else {
-            this.outputInfo("Size X: \"" + this.sizeInput[0].getContent() + "\" is not a valid integer");
-        }
         if (StructureUtils.isValidInt(this.sizeInput[1].getContent())){
             this.reflectedEntity.size.y = Integer.parseInt(this.sizeInput[1].getContent());
         }
-        else {
-            this.outputInfo("Size Y: \"" + this.sizeInput[1].getContent() + "\" is not a valid integer");
-        }
         if (StructureUtils.isValidInt(this.sizeInput[2].getContent())){
             this.reflectedEntity.size.z = Integer.parseInt(this.sizeInput[2].getContent());
-        }
-        else {
-            this.outputInfo("Size Z: \"" + this.sizeInput[2].getContent() + "\" is not a valid integer");
         }
 
         this.reflectedEntity.replaceWith = this.replaceWithInput.getContent();

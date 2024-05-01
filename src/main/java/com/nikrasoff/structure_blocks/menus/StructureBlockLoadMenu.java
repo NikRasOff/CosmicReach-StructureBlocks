@@ -26,13 +26,11 @@ public class StructureBlockLoadMenu extends BaseStructureBlockMenu {
     protected void onApply() {
         this.copyToEntity();
         this.reflectedEntity.loadStructure();
-        this.outputInfo(Structure.output);
     }
 
     protected void onLoad(){
         this.onApply();
         this.reflectedEntity.placeStructure();
-        this.outputInfo(Structure.output);
     }
 
 }

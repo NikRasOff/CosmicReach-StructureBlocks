@@ -21,14 +21,14 @@ public class StructureGroupsMenu extends BasicMenu {
         this.addBackButton();
 
         this.idInput = new FixedTextBoxElement();
-        this.idInput.setBounds(0, -70, 500, 50);
-        this.idInput.label = "";
+        this.idInput.setBounds(0, -70, 1000, 50);
+        this.idInput.label = "Group ID: ";
         this.idInput.setContent("structure_blocks:example_group");
         this.idInput.updateText();
         this.addFluxElement(idInput);
 
         ButtonElement loadGroup = new ButtonElement(() -> {
-            StructureGroup newStructureGroup = StructureGroup.loadStructureGroup(Identifier.fromString(this.idInput.getContent()));
+            StructureGroup newStructureGroup = StructureGroup.getStructureGroup(Identifier.fromString(this.idInput.getContent()));
             if (newStructureGroup != null) GameState.switchToGameState(new StructureGroupEditMenu(newStructureGroup, this));
         });
         loadGroup.setBounds(0, 0, 250, 50);
