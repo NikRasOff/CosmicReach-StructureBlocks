@@ -1,6 +1,9 @@
 package com.nikrasoff.structure_blocks.util;
 
 import com.badlogic.gdx.math.Vector3;
+import finalforeach.cosmicreach.blocks.BlockPosition;
+
+import java.util.Objects;
 
 public class IntVector3 {
     public int x;
@@ -25,11 +28,19 @@ public class IntVector3 {
         this(vector.x, vector.y, vector.z);
     }
 
+    public IntVector3(BlockPosition blockPos){
+        this(blockPos.getGlobalX(), blockPos.getGlobalY(), blockPos.getGlobalZ());
+    }
+
     public IntVector3 add(IntVector3 other){
         this.x += other.x;
         this.y += other.y;
         this.z += other.z;
         return this;
+    }
+
+    public IntVector3 add(int x, int y, int z){
+        return this.add(new IntVector3(x, y, z));
     }
 
     public IntVector3 sub(IntVector3 other){
@@ -81,5 +92,18 @@ public class IntVector3 {
     @Override
     public String toString() {
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntVector3 that = (IntVector3) o;
+        return x == that.x && y == that.y && z == that.z;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z);
     }
 }

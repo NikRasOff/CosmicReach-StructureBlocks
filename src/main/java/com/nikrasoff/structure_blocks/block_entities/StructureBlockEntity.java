@@ -21,6 +21,7 @@ public class StructureBlockEntity extends BlockEntity {
     public String structureId = "structure_blocks:example/house_small";
     public int structureBlockMode = 0;
     public boolean airToVoid = false;
+    public boolean processJigsawBlocks = true;
 
     public Structure currentStructure;
 
@@ -53,6 +54,7 @@ public class StructureBlockEntity extends BlockEntity {
                 compound.putInt("sizeX", this.size.x);
                 compound.putInt("sizeY", this.size.y);
                 compound.putInt("sizeZ", this.size.z);
+                compound.putBoolean("processJigsaw", this.processJigsawBlocks);
             }
         }
         return compound;
@@ -82,6 +84,7 @@ public class StructureBlockEntity extends BlockEntity {
                 this.size.x = compound.getInt("sizeX");
                 this.size.y = compound.getInt("sizeY");
                 this.size.z = compound.getInt("sizeZ");
+                this.processJigsawBlocks = compound.getBoolean("processJigsaw");
             }
         }
     }
@@ -91,14 +94,15 @@ public class StructureBlockEntity extends BlockEntity {
         if (this.currentStructure != null){
             this.size = this.currentStructure.size.cpy();
         }
+        else {
+            this.size = new IntVector3();
+        }
     }
 
     public void placeStructure(){
-        if (this.currentStructure == null){
-            this.loadStructure();
-            if (this.currentStructure == null) return;
-        }
-        this.currentStructure.place(this.getZone().zoneId, this.getBlockPos().getOffsetBlockPos(this.getZone(), this.offset.x, this.offset.y, this.offset.z));
+        this.loadStructure();
+        if (this.currentStructure == null) return;
+        this.currentStructure.place(this.getZone().zoneId, this.getBlockPos().getOffsetBlockPos(this.getZone(), this.offset.x, this.offset.y, this.offset.z), this.processJigsawBlocks);
     }
 
     public void openBlockMenu(){

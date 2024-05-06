@@ -6,13 +6,13 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import com.nikrasoff.structure_blocks.StructureBlocks;
 import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
+import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
 import com.nikrasoff.structure_blocks.block_entities.StructureBlockEntity;
 import com.nikrasoff.structure_blocks.structure.block_replacements.BlockReplacementFull;
 import com.nikrasoff.structure_blocks.structure.rules.*;
 import com.nikrasoff.structure_blocks.util.BlockEntitySaver;
 import com.nikrasoff.structure_blocks.util.IntVector3;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
-import dev.crmodders.flux.api.v5.resource.AssetLoader;
 import dev.crmodders.flux.registry.registries.AccessableRegistry;
 import dev.crmodders.flux.tags.Identifier;
 import dev.crmodders.flux.util.BlockPositionUtil;
@@ -24,6 +24,12 @@ import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.io.SaveLocation;
 import finalforeach.cosmicreach.world.BlockSetter;
 import finalforeach.cosmicreach.world.Zone;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.Tag;
+import ru.nern.becraft.bed.api.BlockEntity;
+import ru.nern.becraft.bed.api.BlockEntityType;
+import ru.nern.becraft.bed.handlers.BlockEntityLoadHandler;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -43,7 +49,7 @@ public class Structure {
 
     public Structure(){}
 
-    public boolean place(String zoneID, BlockPosition pos){
+    public void place(String zoneID, BlockPosition pos, boolean processJigsaw){
         Array<BlockState> blockStatePalette = new Array<>();
         Zone zone = InGame.world.getZone(zoneID);
         try {
@@ -51,7 +57,7 @@ public class Structure {
             ZipEntry entry = zipInputStream.getNextEntry();
 
             if (version < 1 || version > 3) {
-                return false;
+                return;
             }
             while (entry != null) {
                 if (entry.isDirectory()) continue;
@@ -128,10 +134,35 @@ public class Structure {
                 entry = zipInputStream.getNextEntry();
             }
             zipInputStream.close();
-            return true;
         }
-        catch (IOException exception){
-            return false;
+        catch (IOException ignored){
+            return;
+        }
+
+        if (!processJigsaw) return;
+
+        IntVector3 pos1 = new IntVector3(pos.getGlobalX(), pos.getGlobalY(), pos.getGlobalZ());
+        IntVector3 pos2 = pos1.cpy().add(this.size).sub(new IntVector3(1, 1, 1));
+
+        processJigsaw(pos1, pos2, new Array<>(), -1);
+    }
+
+    public static void processJigsaw(IntVector3 pos1, IntVector3 pos2, Array<IntVector3> notProcessBlocks, int chain){
+        Array<BlockEntity> ent = BlockEntitySaver.getBlockEntities(pos1, pos2, JigsawBlockEntity.BE_TYPE);
+        ent.sort((o1, o2) -> {
+            JigsawBlockEntity ent1 = (JigsawBlockEntity) o1;
+            JigsawBlockEntity ent2 = (JigsawBlockEntity) o2;
+            return -Integer.compare(ent1.processPriority, ent2.processPriority);
+        });
+        for (BlockEntity e : ent){
+            JigsawBlockEntity jigsaw = (JigsawBlockEntity) e;
+            if (notProcessBlocks.contains(new IntVector3(e.getBlockPos()), false)){
+                jigsaw.disappear();
+                continue;
+            }
+            if (chain < 0) jigsaw.process();
+            else jigsaw.process(chain);
+            jigsaw.disappear();
         }
     }
 
@@ -141,6 +172,74 @@ public class Structure {
             return true;
         }
         return ALL_STRUCTURES.containsKey(structureID);
+    }
+
+    public ListTag<CompoundTag> getJigsaws(String facing, String jigsawName){
+        ListTag<CompoundTag> result = (ListTag<CompoundTag>) ListTag.createUnchecked(CompoundTag.class);
+
+        ListTag<CompoundTag> allJigsaws = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
+        allJigsaws.forEach((beTag) -> {
+            if (beTag.getString("facing").equals(facing) && (beTag.getString("blockName").equals(jigsawName) || jigsawName.equals("any"))){
+                result.add(beTag);
+            }
+        });
+
+        return result;
+    }
+
+    public ListTag<CompoundTag> getBlockEntityData(BlockEntityType<? extends BlockEntity> type){
+        ListTag<CompoundTag> result = (ListTag<CompoundTag>) ListTag.createUnchecked(CompoundTag.class);
+
+        if (version != 3) {
+            return result;
+        }
+        try{
+            ZipInputStream zipInputStream = new ZipInputStream(assetFile.read());
+            ZipEntry entry = zipInputStream.getNextEntry();
+
+            while (entry != null){
+                if (entry.isDirectory()) {
+                    entry = zipInputStream.getNextEntry();
+                    continue;
+                }
+
+                if (entry.getName().equalsIgnoreCase("bed.bed")){
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    byte[] bytes = new byte[1024];
+                    int len;
+                    while ((len = zipInputStream.read(bytes)) > 0) {
+                        outputStream.write(bytes, 0, len);
+                    }
+
+                    FileHandle bedFile = new FileHandle(SaveLocation.getSaveFolderLocation() + "/temp.bed");
+                    bedFile.write(false).write(outputStream.toByteArray());
+
+                    CompoundTag bedCompound = BlockEntityLoadHandler.readBED(bedFile.file());
+                    Tag<?> chunkTag = bedCompound.get("area");
+                    if (!(chunkTag instanceof ListTag)) {
+                        break;
+                    }
+                    ListTag<CompoundTag> beTagList = ((ListTag)chunkTag).asCompoundTagList();
+
+                    beTagList.forEach((beTag) -> {
+                        Identifier id = Identifier.fromString(beTag.getString("id"));
+
+                        if (id.equals(type.getId())){
+                            result.add(beTag);
+                        }
+                    });
+
+                    bedFile.delete();
+                    break;
+                }
+                entry = zipInputStream.getNextEntry();
+            }
+            zipInputStream.close();
+        }
+        catch (IOException e){
+            return result;
+        }
+        return result;
     }
 
     public static Structure getStructure(Identifier structureID){
@@ -155,6 +254,18 @@ public class Structure {
         BlockPosition entityPos = entity.getBlockPos();
         IntVector3 pos1 = new IntVector3(entityPos.getGlobalX(), entityPos.getGlobalY(), entityPos.getGlobalZ()).add(entity.offset);
         IntVector3 pos2 = pos1.cpy().add(entity.size);
+        if (entity.size.x < 0) {
+            pos1.x += 1;
+            pos2.x += 1;
+        }
+        if (entity.size.y < 0) {
+            pos1.y += 1;
+            pos1.x += 1;
+        }
+        if (entity.size.z < 0) {
+            pos1.z += 1;
+            pos2.z += 1;
+        }
 
         BlockReplaceRuleset ruleset = new BlockReplaceRuleset();
         ruleset.add(new BlockReplaceRulePosition(new BlockReplacementFull(BlockState.getInstance(entity.replaceWith)), entityPos));
@@ -168,7 +279,7 @@ public class Structure {
         saveStructure(pos1, pos2, entity.getZone().zoneId, Identifier.fromString(entity.structureId), ruleset);
     }
 
-    public static boolean saveStructure(IntVector3 pos1, IntVector3 pos2, String zoneID, Identifier structureID, BlockReplaceRuleset ruleset){
+    public static void saveStructure(IntVector3 pos1, IntVector3 pos2, String zoneID, Identifier structureID, BlockReplaceRuleset ruleset){
         // A lot of this is taken from/inspired by Cosmatica
 
         IntVector3 minPos = IntVector3.lesserVector(pos1, pos2);
@@ -242,13 +353,12 @@ public class Structure {
         }
         catch (IOException exception){
             bedFile.delete();
-            return false;
+            return;
         }
         bedFile.delete();
 
         loadStructure(new FileHandle(saveFile));
 
-        return true;
     }
 
     public static Structure loadStructure(Identifier structureID){

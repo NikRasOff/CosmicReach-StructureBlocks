@@ -34,7 +34,7 @@ public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
         this.processPriority.hAnchor = HorizontalAnchor.CENTERED;
         this.attachmentPriority = this.createTextInput(177.5F, 250, 345, 50, "Attachment priority: ", "");
         this.attachmentPriority.hAnchor = HorizontalAnchor.CENTERED;
-        this.chainLength = this.createIntSlider(-177.5F, 310, 345, 50, 1, 50, 1, "Chain Length: ");
+        this.chainLength = this.createIntSlider(-177.5F, 310, 345, 50, 1, 20, 1, "Chain Length: ");
         this.chainLength.hAnchor = HorizontalAnchor.CENTERED;
 
         ButtonElement backButton = this.createButton(-150, -15, 250, 50, this::onBack, "Back");

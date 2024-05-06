@@ -29,15 +29,18 @@ public class BlockEntitySaver {
         IntVector3 minPos = IntVector3.lesserVector(pos1, pos2);
         IntVector3 maxPos = IntVector3.greaterVector(pos1, pos2);
 
+
         Array<BlockEntity> result = new Array<>();
 
-        for (int x = minPos.x; x < maxPos.x; ++x){
-            for (int y = minPos.y; y < maxPos.y; ++y){
-                for (int z = minPos.z; z < maxPos.z; ++z){
+        for (int x = minPos.x; x <= maxPos.x; ++x){
+            for (int y = minPos.y; y <= maxPos.y; ++y){
+                for (int z = minPos.z; z <= maxPos.z; ++z){
                     BlockPosition curBlock = BlockPositionUtil.getBlockPositionAtGlobalPos(x, y, z);
                     BlockEntity curEntity = BEUtils.getBlockEntity(curBlock);
                     if (curEntity == null) continue;
-                    if (curEntity.getType() == type) result.add(curEntity);
+                    if (curEntity.getType() == type) {
+                        result.add(curEntity);
+                    }
                 }
             }
         }

@@ -2,25 +2,29 @@ package com.nikrasoff.structure_blocks.structure;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.nikrasoff.structure_blocks.StructureBlocks;
 import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
+import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.registry.registries.AccessableRegistry;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.GameAssetLoader;
+import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.io.SaveLocation;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class StructureGroup {
     private static final Map<Identifier, StructureGroup> ALL_STRUCTURE_GROUPS = new HashMap<>();
@@ -42,6 +46,30 @@ public class StructureGroup {
             if (i.structureID.equals(structureID)) return true;
         }
         return false;
+    }
+
+    public Structure getStructureByConnection(String connection, String jigsawName, long seed){
+        Array<StructureGroupEntry> resultArray = new Array<>();
+        for (StructureGroupEntry entry : this.structures){
+            Structure entryStructure = Structure.getStructure(Identifier.fromString(entry.structureID));
+            if (entryStructure == null) continue;
+            ListTag<CompoundTag> structureJigsawEntities = entryStructure.getJigsaws(connection, jigsawName);
+            if (structureJigsawEntities.size() != 0) resultArray.add(entry);
+        }
+
+        int sumOfWeights = 0;
+        for (StructureGroupEntry entry : resultArray){
+            sumOfWeights += entry.weight;
+        }
+
+        RandomXS128 random = new RandomXS128(seed);
+        int randomNumber = random.nextInt(sumOfWeights);
+        for (StructureGroupEntry entry : resultArray){
+            if (randomNumber < entry.weight) return Structure.getStructure(Identifier.fromString(entry.structureID));
+            randomNumber -= entry.weight;
+        }
+
+        return null;
     }
 
     public void saveStructureGroup(){
