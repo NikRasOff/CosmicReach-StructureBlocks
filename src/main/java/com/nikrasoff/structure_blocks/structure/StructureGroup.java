@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class StructureGroup {
-    private static final Map<Identifier, StructureGroup> ALL_STRUCTURE_GROUPS = new HashMap<>();
+    public static final Map<Identifier, StructureGroup> ALL_STRUCTURE_GROUPS = new HashMap<>();
 
     public Array<StructureGroupEntry> structures = new Array<>();
     public String idString;

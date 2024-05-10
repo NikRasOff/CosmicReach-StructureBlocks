@@ -18,7 +18,7 @@ public class StructureBlockEntity extends BlockEntity {
     public IntVector3 offset = new IntVector3();
     public IntVector3 size = new IntVector3();
     public String replaceWith = "base:air[default]";
-    public String structureId = "structure_blocks:example/house_small";
+    public String structureId = "";
     public int structureBlockMode = 0;
     public boolean airToVoid = false;
     public boolean processJigsawBlocks = true;

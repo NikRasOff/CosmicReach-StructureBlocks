@@ -3,16 +3,18 @@ package com.nikrasoff.structure_blocks.menus;
 import com.nikrasoff.structure_blocks.block_entities.JigsawBlockEntity;
 import com.nikrasoff.structure_blocks.menus.elements.BetterIntSlider;
 import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
+import com.nikrasoff.structure_blocks.menus.elements.StructureGroupSelectButton;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextElement;
+import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;
 
 public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
     FixedTextBoxElement replaceWith;
     FixedTextBoxElement blockName;
-    FixedTextBoxElement structureGroupID;
+    StructureGroupSelectButton structureGroupID;
     FixedTextBoxElement processPriority;
     FixedTextBoxElement attachmentPriority;
     BetterIntSlider chainLength;
@@ -25,8 +27,10 @@ public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
 
         this.blockName = this.createTextInput(0, 70, 700, 50, "Name: ", "");
         this.blockName.hAnchor = HorizontalAnchor.CENTERED;
-        this.structureGroupID = this.createTextInput(0, 130, 700, 50, "Structure group ID: ", "");
-        this.structureGroupID.hAnchor = HorizontalAnchor.CENTERED;
+
+        this.structureGroupID = new StructureGroupSelectButton(0, 130, 700, 50, HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED, this);
+        this.addFluxElement(this.structureGroupID);
+
         this.replaceWith = this.createTextInput(0, 190, 700, 50, "Replace with: ", "");
         this.replaceWith.hAnchor = HorizontalAnchor.CENTERED;
 
@@ -55,7 +59,9 @@ public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
         if (this.reflectedEntity == null) return;
 
         this.reflectedEntity.name = this.blockName.getContent();
-        this.reflectedEntity.structureGroupID = this.structureGroupID.getContent();
+        if (this.structureGroupID.structureID != null){
+            this.reflectedEntity.structureGroupID = this.structureGroupID.structureID.toString();
+        }
         this.reflectedEntity.replaceWith = this.replaceWith.getContent();
 
         if (StructureUtils.isValidInt(this.processPriority.getContent())){
@@ -75,8 +81,16 @@ public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
         this.blockName.setContent(this.reflectedEntity.name);
         this.blockName.updateText();
 
-        this.structureGroupID.setContent(this.reflectedEntity.structureGroupID);
-        this.structureGroupID.updateText();
+        if (!this.reflectedEntity.structureGroupID.isEmpty()){
+            this.structureGroupID.structureID = Identifier.fromString(this.reflectedEntity.structureGroupID);
+            this.structureGroupID.text = this.reflectedEntity.structureGroupID;
+            this.structureGroupID.updateText();
+        }
+        else {
+            this.structureGroupID.structureID = null;
+            this.structureGroupID.text = "Select structure group";
+            this.structureGroupID.updateText();
+        }
 
         this.replaceWith.setContent(this.reflectedEntity.replaceWith);
         this.replaceWith.updateText();

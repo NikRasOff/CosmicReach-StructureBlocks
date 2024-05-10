@@ -9,19 +9,13 @@ import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;
 
 public abstract class BaseStructureBlockMenu extends BlockEntityMenu<StructureBlockEntity> {
-    protected TextElement blockOutputLabel;
-
     private final TextBoxElement[] offsetInput;
-    public final TextBoxElement structureIDInput;
 
     public BaseStructureBlockMenu(){
         TextElement blockLabel = this.createLabel(0, 15, 250, 50, "Structure block");
         blockLabel.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
 
         this.createLabel(15, 70, 250, 50, "Structure Block Mode: ");
-
-        this.createLabel(15, 130, 250, 50, "Structure name:");
-        this.structureIDInput = this.createTextInput(280, 130, 500, 50, "", "default");
 
         this.createLabel(15, 190, 250, 50, "Structure offset:");
         this.offsetInput = this.createVectorInput(280, 190);
@@ -48,9 +42,6 @@ public abstract class BaseStructureBlockMenu extends BlockEntityMenu<StructureBl
         this.offsetInput[1].updateText();
         this.offsetInput[2].setContent(String.valueOf(this.reflectedEntity.offset.z));
         this.offsetInput[2].updateText();
-
-        this.structureIDInput.setContent(this.reflectedEntity.structureId);
-        this.structureIDInput.updateText();
     }
 
     @Override
@@ -66,7 +57,5 @@ public abstract class BaseStructureBlockMenu extends BlockEntityMenu<StructureBl
         if (StructureUtils.isValidInt(this.offsetInput[2].getContent())){
             this.reflectedEntity.offset.z = Integer.parseInt(this.offsetInput[2].getContent());
         }
-
-        this.reflectedEntity.structureId = this.structureIDInput.getContent();
     }
 }

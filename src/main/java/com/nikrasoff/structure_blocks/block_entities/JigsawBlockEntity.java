@@ -29,7 +29,7 @@ public class JigsawBlockEntity extends BlockEntity {
 
     public String replaceWith = "base:air[default]";
     public String name = "any";
-    public String structureGroupID = "structure_blocks:example_group";
+    public String structureGroupID = "";
     public int processPriority = 1;
     public int attachmentPriority = 1;
     public int chainLength = 1;
@@ -122,6 +122,7 @@ public class JigsawBlockEntity extends BlockEntity {
     }
 
     public void process(int chain){
+        // Magic!
         if (chain <= 0) return;
 
         StructureGroup targetGroup = StructureGroup.getStructureGroup(Identifier.fromString(this.structureGroupID));

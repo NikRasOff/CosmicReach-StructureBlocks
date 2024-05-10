@@ -17,8 +17,13 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
 
     private final FixedToggleElement airToVoidInput;
 
+    public final TextBoxElement structureIDInput;
+
     public StructureBlockSaveMenu(){
         super();
+
+        this.createLabel(15, 130, 250, 50, "Structure name:");
+        this.structureIDInput = this.createTextInput(280, 130, 500, 50, "", "default");
 
         this.createButton(280, 70, 250, 50, () -> {
             StructureBlockEntity entity = this.reflectedEntity;
@@ -76,6 +81,8 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
         this.replaceWithInput.updateText();
         this.airToVoidInput.value = this.reflectedEntity.airToVoid;
         this.airToVoidInput.updateText();
+        this.structureIDInput.setContent(this.reflectedEntity.structureId);
+        this.structureIDInput.updateText();
     }
 
     @Override
@@ -95,5 +102,6 @@ public class StructureBlockSaveMenu extends BaseStructureBlockMenu {
 
         this.reflectedEntity.replaceWith = this.replaceWithInput.getContent();
         this.reflectedEntity.airToVoid = this.airToVoidInput.value;
+        this.reflectedEntity.structureId = this.structureIDInput.getContent();
     }
 }

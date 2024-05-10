@@ -43,7 +43,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class Structure {
-    private static final Map<Identifier, Structure> ALL_STRUCTURES = new HashMap<>();
+    public static final Map<Identifier, Structure> ALL_STRUCTURES = new HashMap<>();
     public IntVector3 size = new IntVector3(0, 0, 0);
     public int version = 0;
     private FileHandle assetFile;
@@ -150,9 +150,8 @@ public class Structure {
     }
 
     public void processJigsaw(IntVector3 origin, Array<IntVector3> notProcessBlocks, int chain){
-        ListTag<CompoundTag> jigsawData = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
         Array<JigsawBlockEntity> ent = new Array<>();
-        jigsawData.forEach((beData) -> {
+        this.getAllJigsaws().forEach((beData) -> {
             IntVector3 jigsawPositionVector = new IntVector3(beData.getInt("localX"), beData.getInt("localY"), beData.getInt("localZ"));
             jigsawPositionVector.add(origin);
             BlockPosition jigsawPosition = jigsawPositionVector.toBlockPosition();
@@ -187,16 +186,20 @@ public class Structure {
     public ListTag<CompoundTag> getJigsaws(String facing, String jigsawName){
         ListTag<CompoundTag> result = (ListTag<CompoundTag>) ListTag.createUnchecked(CompoundTag.class);
 
-        if (this.jigsawCache == null){
-            this.jigsawCache = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
-        }
-        this.jigsawCache.forEach((beTag) -> {
+        this.getAllJigsaws().forEach((beTag) -> {
             if (beTag.getString("facing").equals(facing) && (beTag.getString("blockName").equals(jigsawName) || jigsawName.equals("any"))){
                 result.add(beTag);
             }
         });
 
         return result;
+    }
+
+    public ListTag<CompoundTag> getAllJigsaws(){
+        if (this.jigsawCache == null){
+            this.jigsawCache = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
+        }
+        return this.jigsawCache;
     }
 
     public void clearJigsawCache(){

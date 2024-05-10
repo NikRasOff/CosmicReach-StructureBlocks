@@ -73,6 +73,7 @@ public class IntVector3 {
     public Vector3 toVector3(){
         return new Vector3(this.x, this.y, this.z);
     }
+
     public BlockPosition toBlockPosition(){
         return BlockPositionUtil.getBlockPositionAtGlobalPos(this.toVector3());
     }
