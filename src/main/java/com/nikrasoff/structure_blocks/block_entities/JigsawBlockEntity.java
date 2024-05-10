@@ -140,10 +140,10 @@ public class JigsawBlockEntity extends BlockEntity {
         structureOrigin.z -= targetJigsaw.getInt("localZ");
 
         targetStructure.place(this.getZone().zoneId, BlockPositionUtil.getBlockPositionAtGlobalPos(structureOrigin.toVector3()), false);
-        IntVector3 pos2 = structureOrigin.cpy().add(targetStructure.size).sub(new IntVector3(1, 1, 1));
         Array<IntVector3> exceptionArray = new Array<>();
         exceptionArray.add(this.getOriginBlock());
-        Structure.processJigsaw(structureOrigin, pos2, exceptionArray, chain - 1);
+        targetStructure.processJigsaw(structureOrigin, exceptionArray, chain - 1);
+        targetStructure.clearJigsawCache();
     }
 
     public void disappear(){

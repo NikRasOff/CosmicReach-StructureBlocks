@@ -1,6 +1,7 @@
 package com.nikrasoff.structure_blocks.util;
 
 import com.badlogic.gdx.math.Vector3;
+import dev.crmodders.flux.util.BlockPositionUtil;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 
 import java.util.Objects;
@@ -71,6 +72,9 @@ public class IntVector3 {
 
     public Vector3 toVector3(){
         return new Vector3(this.x, this.y, this.z);
+    }
+    public BlockPosition toBlockPosition(){
+        return BlockPositionUtil.getBlockPositionAtGlobalPos(this.toVector3());
     }
 
     public static IntVector3 lesserVector(IntVector3 first, IntVector3 second){

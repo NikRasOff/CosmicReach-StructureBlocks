@@ -30,6 +30,7 @@ import net.querz.nbt.tag.Tag;
 import ru.nern.becraft.bed.api.BlockEntity;
 import ru.nern.becraft.bed.api.BlockEntityType;
 import ru.nern.becraft.bed.handlers.BlockEntityLoadHandler;
+import ru.nern.becraft.bed.utils.BEUtils;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -46,6 +47,8 @@ public class Structure {
     public IntVector3 size = new IntVector3(0, 0, 0);
     public int version = 0;
     private FileHandle assetFile;
+
+    private ListTag<CompoundTag> jigsawCache;
 
     public Structure(){}
 
@@ -142,28 +145,35 @@ public class Structure {
         if (!processJigsaw) return;
 
         IntVector3 pos1 = new IntVector3(pos.getGlobalX(), pos.getGlobalY(), pos.getGlobalZ());
-        IntVector3 pos2 = pos1.cpy().add(this.size).sub(new IntVector3(1, 1, 1));
 
-        processJigsaw(pos1, pos2, new Array<>(), -1);
+        processJigsaw(pos1, new Array<>(), -1);
     }
 
-    public static void processJigsaw(IntVector3 pos1, IntVector3 pos2, Array<IntVector3> notProcessBlocks, int chain){
-        Array<BlockEntity> ent = BlockEntitySaver.getBlockEntities(pos1, pos2, JigsawBlockEntity.BE_TYPE);
-        ent.sort((o1, o2) -> {
-            JigsawBlockEntity ent1 = (JigsawBlockEntity) o1;
-            JigsawBlockEntity ent2 = (JigsawBlockEntity) o2;
-            return -Integer.compare(ent1.processPriority, ent2.processPriority);
-        });
-        for (BlockEntity e : ent){
-            JigsawBlockEntity jigsaw = (JigsawBlockEntity) e;
-            if (notProcessBlocks.contains(new IntVector3(e.getBlockPos()), false)){
-                jigsaw.disappear();
-                continue;
+    public void processJigsaw(IntVector3 origin, Array<IntVector3> notProcessBlocks, int chain){
+        ListTag<CompoundTag> jigsawData = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
+        Array<JigsawBlockEntity> ent = new Array<>();
+        jigsawData.forEach((beData) -> {
+            IntVector3 jigsawPositionVector = new IntVector3(beData.getInt("localX"), beData.getInt("localY"), beData.getInt("localZ"));
+            jigsawPositionVector.add(origin);
+            BlockPosition jigsawPosition = jigsawPositionVector.toBlockPosition();
+            BlockEntity be = BEUtils.getBlockEntity(jigsawPosition);
+            if (be instanceof JigsawBlockEntity jigsawEntity){
+                if (notProcessBlocks.contains(jigsawPositionVector, false)){
+                    jigsawEntity.disappear();
+                }
+                else{
+                    ent.add(jigsawEntity);
+                }
             }
-            if (chain < 0) jigsaw.process();
-            else jigsaw.process(chain);
-            jigsaw.disappear();
+        });
+
+        ent.sort((o1, o2) -> -Integer.compare(o1.processPriority, o2.processPriority));
+        for (JigsawBlockEntity e : ent){
+            if (chain < 0) e.process();
+            else e.process(chain);
+            e.disappear();
         }
+        this.clearJigsawCache();
     }
 
     public static boolean structureExists(Identifier structureID){
@@ -177,14 +187,20 @@ public class Structure {
     public ListTag<CompoundTag> getJigsaws(String facing, String jigsawName){
         ListTag<CompoundTag> result = (ListTag<CompoundTag>) ListTag.createUnchecked(CompoundTag.class);
 
-        ListTag<CompoundTag> allJigsaws = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
-        allJigsaws.forEach((beTag) -> {
+        if (this.jigsawCache == null){
+            this.jigsawCache = this.getBlockEntityData(JigsawBlockEntity.BE_TYPE);
+        }
+        this.jigsawCache.forEach((beTag) -> {
             if (beTag.getString("facing").equals(facing) && (beTag.getString("blockName").equals(jigsawName) || jigsawName.equals("any"))){
                 result.add(beTag);
             }
         });
 
         return result;
+    }
+
+    public void clearJigsawCache(){
+        this.jigsawCache = null;
     }
 
     public ListTag<CompoundTag> getBlockEntityData(BlockEntityType<? extends BlockEntity> type){
