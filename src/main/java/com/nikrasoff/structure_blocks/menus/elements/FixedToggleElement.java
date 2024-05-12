@@ -4,6 +4,7 @@ import dev.crmodders.flux.api.v5.gui.base.BaseButton;
 
 public class FixedToggleElement extends BaseButton {
     public boolean value;
+    public String label = "";
 
     public FixedToggleElement(boolean defaultValue) {
         super();
@@ -20,7 +21,7 @@ public class FixedToggleElement extends BaseButton {
 
     @Override
     public void updateText() {
-        this.text = this.value ? "Yes" : "No";
+        this.text = this.label + (this.value ? "Yes" : "No");
         super.updateText();
     }
 }

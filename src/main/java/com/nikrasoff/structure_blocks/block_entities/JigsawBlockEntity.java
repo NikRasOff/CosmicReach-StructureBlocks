@@ -1,5 +1,7 @@
 package com.nikrasoff.structure_blocks.block_entities;
 
+import com.badlogic.gdx.math.RandomXS128;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -33,6 +35,7 @@ public class JigsawBlockEntity extends BlockEntity {
     public int processPriority = 1;
     public int attachmentPriority = 1;
     public int chainLength = 1;
+    public boolean allowIntersections = false;
 
     public String facing;
 
@@ -51,6 +54,7 @@ public class JigsawBlockEntity extends BlockEntity {
         compound.putString("replaceWith", this.replaceWith);
         compound.putString("structureGroupID", this.structureGroupID);
         compound.putString("facing", this.facing);
+        compound.putBoolean("allowIntersections", this.allowIntersections);
         return compound;
     }
 
@@ -63,9 +67,10 @@ public class JigsawBlockEntity extends BlockEntity {
         this.name = compound.getString("blockName");
         this.replaceWith = compound.getString("replaceWith");
         this.structureGroupID = compound.getString("structureGroupID");
+        this.allowIntersections = compound.getBoolean("allowIntersections");
     }
-    public void process(){
-        this.process(this.chainLength);
+    public void process(Array<BoundingBox> intersectionChecks){
+        this.process(this.chainLength, intersectionChecks);
     }
 
     public String getTargetDirection(){
@@ -121,29 +126,69 @@ public class JigsawBlockEntity extends BlockEntity {
         }
     }
 
-    public void process(int chain){
+    public void process(int chain, Array<BoundingBox> intersectChecks){
         // Magic!
         if (chain <= 0) return;
 
         StructureGroup targetGroup = StructureGroup.getStructureGroup(Identifier.fromString(this.structureGroupID));
         if (targetGroup == null) return;
 
-        Structure targetStructure = targetGroup.getStructureByConnection(this.getTargetDirection(), this.name, TimeUtils.millis());
+        Array<StructureGroup.StructureGroupEntry> structureArray = targetGroup.getStructuresByConnection(this.getTargetDirection(), this.name);
+        if (structureArray.isEmpty()) return;
+
+        // Getting structures that won't intersect
+        Array<StructureGroup.StructureGroupEntry> randomArray = new Array<>();
+        int sumOfWeights = 0;
+        for (StructureGroup.StructureGroupEntry entry : structureArray){
+            if (!Structure.getStructure(Identifier.fromString(entry.structureID)).canConnectToJigsaw(this, intersectChecks)){
+                continue;
+            }
+            randomArray.add(entry);
+            sumOfWeights += entry.weight;
+        }
+        if (sumOfWeights == 0) return;
+
+        // Randomly selecting a structure
+        Structure targetStructure = null;
+        RandomXS128 random = new RandomXS128(TimeUtils.millis());
+        int randomNumber = random.nextInt(sumOfWeights);
+        for (StructureGroup.StructureGroupEntry entry : randomArray){
+            if (randomNumber < entry.weight) {
+                targetStructure = Structure.getStructure(Identifier.fromString(entry.structureID));
+                break;
+            }
+            randomNumber -= entry.weight;
+        }
         if (targetStructure == null) return;
 
         ListTag<CompoundTag> jigsawTags = targetStructure.getJigsaws(this.getTargetDirection(), this.name);
         jigsawTags.sort(Comparator.comparingInt(o -> -o.getInt("attachmentPriority")));
 
-        CompoundTag targetJigsaw = jigsawTags.get(0);
-        IntVector3 structureOrigin = this.getOriginBlock();
-        structureOrigin.x -= targetJigsaw.getInt("localX");
-        structureOrigin.y -= targetJigsaw.getInt("localY");
-        structureOrigin.z -= targetJigsaw.getInt("localZ");
+        // Choosing a jigsaw
+        IntVector3 structureOrigin = new IntVector3();
+        for (CompoundTag jigsawTag : jigsawTags){
+            structureOrigin = this.getOriginBlock();
+            structureOrigin.x -= jigsawTag.getInt("localX");
+            structureOrigin.y -= jigsawTag.getInt("localY");
+            structureOrigin.z -= jigsawTag.getInt("localZ");
+            if (this.allowIntersections) break;
+
+            BoundingBox structureBB = targetStructure.getBoundingBox(structureOrigin);
+            boolean flag = false;
+            for (BoundingBox i : intersectChecks){
+                if (i.intersects(structureBB)) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag) break;
+        }
 
         targetStructure.place(this.getZone().zoneId, BlockPositionUtil.getBlockPositionAtGlobalPos(structureOrigin.toVector3()), false);
         Array<IntVector3> exceptionArray = new Array<>();
         exceptionArray.add(this.getOriginBlock());
-        targetStructure.processJigsaw(structureOrigin, exceptionArray, chain - 1);
+        if (!this.allowIntersections) intersectChecks.add(targetStructure.getBoundingBox(structureOrigin));
+        targetStructure.processJigsaw(structureOrigin, exceptionArray, chain - 1, intersectChecks);
         targetStructure.clearJigsawCache();
     }
 

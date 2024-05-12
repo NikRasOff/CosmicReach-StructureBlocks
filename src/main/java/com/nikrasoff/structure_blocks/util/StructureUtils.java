@@ -20,6 +20,24 @@ public class StructureUtils {
         return input.matches("[\\-+]?(?:0|[123456789]\\d*)");
     }
 
+    public static boolean stringFitsQuery(String test, String query){
+        if (query.contains("|")){
+            String[] parts = query.split("\\|");
+            for (String i : parts){
+                if (stringFitsQuery(test, i)) return true;
+            }
+            return false;
+        }
+        if (query.contains("&")){
+            String[] parts = query.split("&");
+            for (String i : parts){
+                if (!stringFitsQuery(test, i)) return false;
+            }
+            return true;
+        }
+        return test.strip().toLowerCase().contains(query.strip().toLowerCase());
+    }
+
     public static UIElement createStructureGroupButton(float x, float y, float w, float h){
         UIElement newButton = new UIElement(x, y, w, h) {
             private StructureGroupsMenu groupsMenu = new StructureGroupsMenu();

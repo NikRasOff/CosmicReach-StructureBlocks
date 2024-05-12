@@ -3,6 +3,7 @@ package com.nikrasoff.structure_blocks.structure;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
 import com.nikrasoff.structure_blocks.StructureBlocks;
 import com.nikrasoff.structure_blocks.StructureBlocksRegistries;
@@ -42,11 +43,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-public class Structure {
+public class Structure implements SearchElement {
     public static final Map<Identifier, Structure> ALL_STRUCTURES = new HashMap<>();
     public IntVector3 size = new IntVector3(0, 0, 0);
     public int version = 0;
     private FileHandle assetFile;
+    public boolean hiddenFromCatalogue = false;
 
     private ListTag<CompoundTag> jigsawCache;
 
@@ -146,10 +148,42 @@ public class Structure {
 
         IntVector3 pos1 = new IntVector3(pos.getGlobalX(), pos.getGlobalY(), pos.getGlobalZ());
 
-        processJigsaw(pos1, new Array<>(), -1);
+        Array<BoundingBox> intChecks = new Array<>();
+        intChecks.add(this.getBoundingBox(pos1));
+
+        processJigsaw(pos1, new Array<>(), -1, intChecks);
+
+
     }
 
-    public void processJigsaw(IntVector3 origin, Array<IntVector3> notProcessBlocks, int chain){
+    public BoundingBox getBoundingBox(IntVector3 origin){
+        return new BoundingBox(origin.toVector3(), origin.cpy().add(this.size).toVector3().sub(new Vector3(0.1F, 0.1F, 0.1F)));
+    }
+
+    public boolean canConnectToJigsaw(JigsawBlockEntity jigsaw, Array<BoundingBox> intersectCheck){
+        if (jigsaw.allowIntersections) return true;
+        ListTag<CompoundTag> jigsawTags = this.getJigsaws(jigsaw.getTargetDirection(), jigsaw.name);
+
+        for (CompoundTag beTag : jigsawTags){
+            IntVector3 structureOrigin = jigsaw.getOriginBlock();
+            structureOrigin.x -= beTag.getInt("localX");
+            structureOrigin.y -= beTag.getInt("localY");
+            structureOrigin.z -= beTag.getInt("localZ");
+
+            BoundingBox structureBB = this.getBoundingBox(structureOrigin);
+            boolean flag = false;
+            for (BoundingBox bb : intersectCheck){
+                if (bb.intersects(structureBB)){
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag) return true;
+        }
+        return false;
+    }
+
+    public void processJigsaw(IntVector3 origin, Array<IntVector3> notProcessBlocks, int chain, Array<BoundingBox> intersectionChecks){
         Array<JigsawBlockEntity> ent = new Array<>();
         this.getAllJigsaws().forEach((beData) -> {
             IntVector3 jigsawPositionVector = new IntVector3(beData.getInt("localX"), beData.getInt("localY"), beData.getInt("localZ"));
@@ -168,8 +202,8 @@ public class Structure {
 
         ent.sort((o1, o2) -> -Integer.compare(o1.processPriority, o2.processPriority));
         for (JigsawBlockEntity e : ent){
-            if (chain < 0) e.process();
-            else e.process(chain);
+            if (chain < 0) e.process(intersectionChecks);
+            else e.process(chain, intersectionChecks);
             e.disappear();
         }
         this.clearJigsawCache();
@@ -445,5 +479,10 @@ public class Structure {
                 loadStructure(f);
             }
         }
+    }
+
+    @Override
+    public boolean isHiddenFromCatalog() {
+        return this.hiddenFromCatalogue;
     }
 }

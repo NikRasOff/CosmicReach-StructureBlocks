@@ -1,16 +1,12 @@
 package com.nikrasoff.structure_blocks.menus;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
-import com.nikrasoff.structure_blocks.menus.elements.StructureSelectButton;
+import com.nikrasoff.structure_blocks.menus.elements.ElementSelectButton;
 import com.nikrasoff.structure_blocks.structure.Structure;
 import com.nikrasoff.structure_blocks.structure.StructureGroup;
-import com.nikrasoff.structure_blocks.menus.elements.ButtonTextBox;
 import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
 import com.nikrasoff.structure_blocks.util.StructureUtils;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.api.v5.gui.TextElement;
-import dev.crmodders.flux.menus.ScrollMenu;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.ui.HorizontalAnchor;
@@ -18,13 +14,19 @@ import finalforeach.cosmicreach.ui.VerticalAnchor;
 
 public class StructureGroupEditMenu extends FixedScrollMenu {
     StructureGroup editedGroup;
-    StructureSelectButton addButton;
+    ElementSelectButton<Structure> addButton;
 
     public boolean markedForDeletion = false;
 
-    protected StructureGroupEditMenu(StructureGroup group, GameState prevGameState){
+    public StructureGroupEditMenu(StructureGroup group, GameState prevGameState){
         super(prevGameState);
+        this.upDistance = 1.55F;
         this.editedGroup = group;
+
+        for (StructureGroup.StructureGroupEntry structure : this.editedGroup.structures){
+            StructureDisplay structureEdit = new StructureDisplay(structure);
+            this.addScrollElement(structureEdit);
+        }
 
         TextElement groupIDDisplay = new TextElement(group.idString);
         groupIDDisplay.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
@@ -39,10 +41,10 @@ public class StructureGroupEditMenu extends FixedScrollMenu {
         deleteButton.updateText();
         this.addFluxElement(deleteButton);
 
-        this.addButton = new StructureSelectButton(130, -10, 250, 50, HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED, this){
+        this.addButton = new ElementSelectButton<>(130, -10, 250, 50, HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED, this, Structure.ALL_STRUCTURES){
             @Override
-            public void selectStructure(Identifier structureID) {
-                super.selectStructure(structureID);
+            public void selectElement(Identifier structureID) {
+                super.selectElement(structureID);
                 StructureGroupEditMenu editMenu = (StructureGroupEditMenu) this.parentState;
                 editMenu.addNewElement();
             }
@@ -69,10 +71,6 @@ public class StructureGroupEditMenu extends FixedScrollMenu {
         cancelButton.updateText();
         this.addFluxElement(cancelButton);
 
-        for (StructureGroup.StructureGroupEntry structure : this.editedGroup.structures){
-            StructureDisplay structureEdit = new StructureDisplay(structure);
-            this.addScrollElement(structureEdit);
-        }
         this.setSelectedIndex(0);
     }
 
@@ -97,9 +95,9 @@ public class StructureGroupEditMenu extends FixedScrollMenu {
     }
 
     public void addNewElement(){
-        if (this.addButton.structureID == null) return;
+        if (this.addButton.elementID == null) return;
 
-        Identifier newIdentifier = this.addButton.structureID;
+        Identifier newIdentifier = this.addButton.elementID;
         if (this.editedGroup.hasStructure(newIdentifier.toString())) return;
 
         Structure newStructure = Structure.getStructure(newIdentifier);

@@ -4,8 +4,31 @@ import dev.crmodders.flux.api.v5.gui.TextBoxElement;
 
 public class FixedTextBoxElement extends TextBoxElement {
     protected static FixedTextBoxElement currentTextBoxElement;
+    protected Runnable onDeactivateAction;
 
     public FixedTextBoxElement(){
+    }
+
+    public void addOnDeactivateAction(Runnable action){
+        this.onDeactivateAction = action;
+    }
+
+    @Override
+    public void onMouseEnter() {
+        if (!this.visible) return;
+        super.onMouseEnter();
+    }
+
+    @Override
+    public void onMouseReleased() {
+        if (!this.visible) return;
+        super.onMouseReleased();
+    }
+
+    @Override
+    public void onMousePressed() {
+        if (!this.visible) return;
+        super.onMousePressed();
     }
 
     @Override
@@ -26,5 +49,6 @@ public class FixedTextBoxElement extends TextBoxElement {
     }
 
     public void onDeactivate(){
+        if (this.onDeactivateAction != null) this.onDeactivateAction.run();
     }
 }

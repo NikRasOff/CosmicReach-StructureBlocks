@@ -1,10 +1,8 @@
 package com.nikrasoff.structure_blocks.menus;
 
 import com.nikrasoff.structure_blocks.menus.elements.ButtonTextBox;
-import com.nikrasoff.structure_blocks.menus.elements.StructureGroupSelectButton;
+import com.nikrasoff.structure_blocks.menus.elements.ElementSelectButton;
 import com.nikrasoff.structure_blocks.structure.StructureGroup;
-import com.nikrasoff.structure_blocks.menus.elements.FixedTextBoxElement;
-import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.menus.BasicMenu;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.gamestates.GameState;
@@ -23,16 +21,16 @@ public class StructureGroupsMenu extends BasicMenu {
 
         this.addBackButton();
 
-        StructureGroupSelectButton loadGroup = new StructureGroupSelectButton(0, -30, 250, 50, HorizontalAnchor.CENTERED, VerticalAnchor.CENTERED, this){
+        ElementSelectButton<StructureGroup> loadGroup = new ElementSelectButton<>(0, -30, 250, 50, HorizontalAnchor.CENTERED, VerticalAnchor.CENTERED, this, StructureGroup.ALL_STRUCTURE_GROUPS){
             @Override
-            public void selectStructureGroup(Identifier groupID) {
+            public void selectElement(Identifier groupID) {
                 if (groupID == null) {
-                    super.selectStructureGroup(null);
+                    super.selectElement(null);
                     return;
                 }
-                super.selectStructureGroup(groupID);
+                super.selectElement(groupID);
                 StructureGroup newStructureGroup = StructureGroup.getStructureGroup(groupID);
-                if (newStructureGroup != null) GameState.switchToGameState(FixedScrollMenu.createGroupEditMenu(newStructureGroup, this.parentState));
+                if (newStructureGroup != null) GameState.switchToGameState(new StructureGroupEditMenu(newStructureGroup, this.parentState));
             }
         };
         loadGroup.text = "Load structure group";
@@ -50,6 +48,6 @@ public class StructureGroupsMenu extends BasicMenu {
 
     private void createNewGroup(){
         StructureGroup newStructureGroup = new StructureGroup(this.newGroup.getContent());
-        GameState.switchToGameState(FixedScrollMenu.createGroupEditMenu(newStructureGroup, this));
+        GameState.switchToGameState(new StructureGroupEditMenu(newStructureGroup, this));
     }
 }

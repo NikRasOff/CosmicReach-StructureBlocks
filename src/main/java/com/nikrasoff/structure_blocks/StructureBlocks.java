@@ -51,6 +51,14 @@ public class StructureBlocks implements ModInitializer {
 			StructureBlocksRegistries.STRUCTURES.register(structureID, Structure.loadStructure(structureID));
 		}
 
+		String[] hiddenStructures = {
+				"nowhere:he/is/waiting"
+		};
+		for (String structure : hiddenStructures){
+			Structure funny = Structure.getStructure(Identifier.fromString(structure));
+			funny.hiddenFromCatalogue = true;
+		}
+
 		BlockEvents.registerBlockEventAction(BlockActionFaceAwayFromPlayer.class);
 
 		FluxRegistries.BLOCKS.register(StructureBlock.IDENTIFIER, new StructureBlock());

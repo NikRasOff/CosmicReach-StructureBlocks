@@ -3,6 +3,7 @@ package com.nikrasoff.structure_blocks.structure;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.RandomXS128;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
@@ -26,7 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-public class StructureGroup {
+public class StructureGroup implements SearchElement {
     public static final Map<Identifier, StructureGroup> ALL_STRUCTURE_GROUPS = new HashMap<>();
 
     public Array<StructureGroupEntry> structures = new Array<>();
@@ -48,7 +49,7 @@ public class StructureGroup {
         return false;
     }
 
-    public Structure getStructureByConnection(String connection, String jigsawName, long seed){
+    public Array<StructureGroupEntry> getStructuresByConnection(String connection, String jigsawName){
         Array<StructureGroupEntry> resultArray = new Array<>();
         for (StructureGroupEntry entry : this.structures){
             Structure entryStructure = Structure.getStructure(Identifier.fromString(entry.structureID));
@@ -57,19 +58,7 @@ public class StructureGroup {
             if (structureJigsawEntities.size() != 0) resultArray.add(entry);
         }
 
-        int sumOfWeights = 0;
-        for (StructureGroupEntry entry : resultArray){
-            sumOfWeights += entry.weight;
-        }
-
-        RandomXS128 random = new RandomXS128(seed);
-        int randomNumber = random.nextInt(sumOfWeights);
-        for (StructureGroupEntry entry : resultArray){
-            if (randomNumber < entry.weight) return Structure.getStructure(Identifier.fromString(entry.structureID));
-            randomNumber -= entry.weight;
-        }
-
-        return null;
+        return resultArray;
     }
 
     public void saveStructureGroup(){
@@ -128,6 +117,11 @@ public class StructureGroup {
                 loadStructureGroup(f);
             }
         }
+    }
+
+    @Override
+    public boolean isHiddenFromCatalog() {
+        return false;
     }
 
     public static class StructureGroupEntry implements Comparable<StructureGroupEntry>, Json.Serializable {
