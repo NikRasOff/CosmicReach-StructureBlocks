@@ -3,7 +3,7 @@ package com.nikrasoff.structure_blocks.menus.elements;
 import dev.crmodders.flux.api.v5.gui.TextBoxElement;
 
 public class FixedTextBoxElement extends TextBoxElement {
-    protected static FixedTextBoxElement currentTextBoxElement;
+    public static FixedTextBoxElement currentTextBoxElement;
     protected Runnable onDeactivateAction;
 
     public FixedTextBoxElement(){

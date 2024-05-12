@@ -18,8 +18,12 @@ import java.util.Map;
 
 public class ElementSelectMenu<T extends SearchElement> extends FixedScrollMenu {
     private final Map<Identifier, T> elementMap;
+    private boolean elementChosen = false;
+    private boolean cancelled = false;
+    private final ElementSelectButton<T> parentButton;
     public ElementSelectMenu(Identifier selected, ElementSelectButton<T> parentButton, Map<Identifier, T> elementMap){
         super();
+        this.parentButton = parentButton;
         this.upDistance = 2.35F;
         this.elementMap = elementMap;
         this.previousState = parentButton.parentState;
@@ -34,25 +38,29 @@ public class ElementSelectMenu<T extends SearchElement> extends FixedScrollMenu 
         searchBar.updateText();
         this.addFluxElement(searchBar);
 
-        ButtonElement backButton = new ButtonElement(() -> {
-            this.deactivate();
-            parentButton.selectElement(selected);
-        });
+        ButtonElement backButton = new ButtonElement(() -> this.cancelled = true);
         backButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED);
         backButton.setBounds(-130, -10, 250, 50);
         backButton.translation = FluxConstants.TextCancel;
         backButton.updateText();
         this.addFluxElement(backButton);
 
-        ButtonElement selectButton = new ButtonElement(() -> {
-            this.deactivate();
-            parentButton.selectElement(this.getCurrentElementID());
-        });
+        ButtonElement selectButton = new ButtonElement(() -> this.elementChosen = true);
         selectButton.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.BOTTOM_ALIGNED);
         selectButton.setBounds(130, -10, 250, 50);
         selectButton.text = "Select";
         selectButton.updateText();
         this.addFluxElement(selectButton);
+    }
+
+    @Override
+    public void render(float partTime) {
+        if (this.cancelled) this.onEscape();
+        if (this.elementChosen) {
+            this.deactivate();
+            this.parentButton.selectElement(this.getCurrentElementID());
+        }
+        super.render(partTime);
     }
 
     private void addElementButton(Identifier id){

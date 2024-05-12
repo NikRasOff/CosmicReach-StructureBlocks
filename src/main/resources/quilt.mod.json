@@ -24,7 +24,8 @@
     },
 
     "entrypoints": {
-      "init": "com.nikrasoff.structure_blocks.StructureBlocks"
+      "init": "com.nikrasoff.structure_blocks.StructureBlocks",
+      "modmenu": "com.nikrasoff.structure_blocks.menus.StructureBlocksModMenu"
     },
 
     "depends": [

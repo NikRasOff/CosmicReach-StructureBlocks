@@ -3,6 +3,7 @@ package com.nikrasoff.structure_blocks.menus;
 import com.nikrasoff.structure_blocks.menus.elements.ButtonTextBox;
 import com.nikrasoff.structure_blocks.menus.elements.ElementSelectButton;
 import com.nikrasoff.structure_blocks.structure.StructureGroup;
+import dev.crmodders.flux.api.v5.gui.TextElement;
 import dev.crmodders.flux.menus.BasicMenu;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.gamestates.GameState;
@@ -11,15 +12,17 @@ import finalforeach.cosmicreach.ui.VerticalAnchor;
 
 public class StructureGroupsMenu extends BasicMenu {
     private final ButtonTextBox newGroup;
-    public void switchTo(){
-        this.previousState = GameState.currentGameState;
-        GameState.switchToGameState(this);
-    }
 
-    public StructureGroupsMenu(){
-        super();
+    public StructureGroupsMenu(GameState previousState){
+        super(previousState);
 
         this.addBackButton();
+
+        TextElement menuLabel = new TextElement("Structure group menu");
+        menuLabel.setAnchors(HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED);
+        menuLabel.setBounds(0, 10, 250, 50);
+        menuLabel.backgroundEnabled = false;
+        this.addFluxElement(menuLabel);
 
         ElementSelectButton<StructureGroup> loadGroup = new ElementSelectButton<>(0, -30, 250, 50, HorizontalAnchor.CENTERED, VerticalAnchor.CENTERED, this, StructureGroup.ALL_STRUCTURE_GROUPS){
             @Override

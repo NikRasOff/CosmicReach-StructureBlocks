@@ -467,6 +467,7 @@ public class Structure implements SearchElement {
             }
         }
         catch (IOException exception){
+            StructureBlocks.LOGGER.error("Something went wrong trying to load structure \"" + structureFile + "\": " + exception);
             return null;
         }
         return null;

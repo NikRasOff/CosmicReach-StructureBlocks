@@ -10,6 +10,7 @@ import com.nikrasoff.structure_blocks.structure.StructureGroup;
 import dev.crmodders.flux.api.v5.gui.ButtonElement;
 import dev.crmodders.flux.tags.Identifier;
 import finalforeach.cosmicreach.GameAssetLoader;
+import finalforeach.cosmicreach.gamestates.GameState;
 import finalforeach.cosmicreach.io.SaveLocation;
 import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.UIElement;
@@ -40,7 +41,6 @@ public class StructureUtils {
 
     public static UIElement createStructureGroupButton(float x, float y, float w, float h){
         UIElement newButton = new UIElement(x, y, w, h) {
-            private StructureGroupsMenu groupsMenu = new StructureGroupsMenu();
             public void onCreate(){
                 super.onCreate();
                 this.updateText();
@@ -49,7 +49,7 @@ public class StructureUtils {
             @Override
             public void onClick() {
                 super.onClick();
-                groupsMenu.switchTo();
+                GameState.switchToGameState(new StructureGroupsMenu(GameState.currentGameState));
             }
 
             public void updateText(){

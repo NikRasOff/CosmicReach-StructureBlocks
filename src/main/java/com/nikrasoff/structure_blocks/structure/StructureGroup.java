@@ -32,6 +32,7 @@ public class StructureGroup implements SearchElement {
 
     public Array<StructureGroupEntry> structures = new Array<>();
     public String idString;
+    public boolean hiddenFromCatalogue = false;
 
     private StructureGroup(){}
 
@@ -88,26 +89,33 @@ public class StructureGroup implements SearchElement {
         return ALL_STRUCTURE_GROUPS.get(groupID);
     }
 
+    public void loadAllStructuresInGroup(boolean hideStructures){
+        for (StructureGroupEntry entry : this.structures){
+            Identifier structureID = Identifier.fromString(entry.structureID);
+            if (Structure.structureExists(structureID)) continue;
+            Structure loadedStructure = Structure.loadStructure(structureID);
+            if (loadedStructure == null) {
+                StructureBlocks.LOGGER.error("Couldn't load structure " + entry.structureID + " from group " + this.idString);
+                continue;
+            }
+            if (hideStructures) loadedStructure.hiddenFromCatalogue = true;
+            StructureBlocksRegistries.STRUCTURES.register(structureID, loadedStructure);
+        }
+    }
+
     public static StructureGroup loadStructureGroup(Identifier groupID){
         return loadStructureGroup(GameAssetLoader.loadAsset("%s:structure_groups/%s.json".formatted(groupID.namespace, groupID.name)));
     }
 
     private static StructureGroup loadStructureGroup(FileHandle groupFile){
-        try {
-            FileInputStream fis = new FileInputStream(groupFile.file());
-            Json json = new Json();
-            json.setIgnoreUnknownFields(true);
-            StructureGroup group = json.fromJson(StructureGroup.class, fis);
-            fis.close();
+        if (!groupFile.exists()) StructureBlocks.LOGGER.error("wtf, it doesn't exist apparently");
+        Json json = new Json();
+        json.setIgnoreUnknownFields(true);
+        StructureGroup group = json.fromJson(StructureGroup.class, groupFile);
 
-            ALL_STRUCTURE_GROUPS.put(Identifier.fromString(group.idString), group);
+        ALL_STRUCTURE_GROUPS.put(Identifier.fromString(group.idString), group);
 
-            return group;
-        }
-        catch (IOException e){
-            StructureBlocks.LOGGER.info("Something went wrong when loading structure group \"" + groupFile + "\": " + e);
-            return null;
-        }
+        return group;
     }
 
     static {
@@ -121,7 +129,7 @@ public class StructureGroup implements SearchElement {
 
     @Override
     public boolean isHiddenFromCatalog() {
-        return false;
+        return this.hiddenFromCatalogue;
     }
 
     public static class StructureGroupEntry implements Comparable<StructureGroupEntry>, Json.Serializable {

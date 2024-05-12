@@ -1,0 +1,23 @@
+{
+"structures": [
+	{
+		"structure_blocks:road/straight_long_z": 3
+	},
+	{
+		"structure_blocks:road/straight_medium_z": 5
+	},
+	{
+		"structure_blocks:road/straight_small_z": 1
+	},
+	{
+		"structure_blocks:road/straight_long_x": 3
+	},
+	{
+		"structure_blocks:road/straight_medium_x": 5
+	},
+	{
+		"structure_blocks:road/straight_small_x": 1
+	}
+],
+"idString": "structure_blocks:example/road/after_turn"
+}

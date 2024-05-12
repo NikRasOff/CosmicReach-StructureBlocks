@@ -10,6 +10,7 @@ import com.nikrasoff.structure_blocks.menus.*;
 import com.nikrasoff.structure_blocks.menus.collections.JigsawBlockMenuCollection;
 import com.nikrasoff.structure_blocks.menus.collections.StructureBlockMenuCollection;
 import com.nikrasoff.structure_blocks.structure.Structure;
+import com.nikrasoff.structure_blocks.structure.StructureGroup;
 import dev.crmodders.cosmicquilt.api.entrypoint.ModInitializer;
 import dev.crmodders.flux.api.v5.events.GameEvents;
 import dev.crmodders.flux.api.v5.generators.BlockGenerator;
@@ -34,11 +35,15 @@ public class StructureBlocks implements ModInitializer {
 
 	@Override
 	public void onInitialize(ModContainer modContainer) {
-		System.out.println("Initialising Structure Blocks!");
+		LOGGER.info("Initialising Structure Blocks!");
 
 		String[] structureIDs = {
 				"example/house_small",
-				"nowhere:he/is/waiting"
+				"nowhere:he/is/waiting",
+				"road/start_posx",
+				"road/start_posz",
+				"road/start_negx",
+				"road/start_negz"
 		};
 		for (String structure : structureIDs){
 			Identifier structureID;
@@ -48,6 +53,7 @@ public class StructureBlocks implements ModInitializer {
 			else{
 				structureID = new Identifier(MOD_ID, structure);
 			}
+
 			StructureBlocksRegistries.STRUCTURES.register(structureID, Structure.loadStructure(structureID));
 		}
 
@@ -57,6 +63,23 @@ public class StructureBlocks implements ModInitializer {
 		for (String structure : hiddenStructures){
 			Structure funny = Structure.getStructure(Identifier.fromString(structure));
 			funny.hiddenFromCatalogue = true;
+		}
+
+		String[] structureGroupIDs = {
+				"example/road/after_turn",
+				"example/road/default"
+		};
+		for (String strGroup : structureGroupIDs){
+			Identifier groupID;
+			if (strGroup.contains(":")){
+				groupID = Identifier.fromString(strGroup);
+			}
+			else{
+				groupID = new Identifier(MOD_ID, strGroup);
+			}
+			StructureGroup loadedGroup = StructureGroup.loadStructureGroup(groupID);
+			loadedGroup.loadAllStructuresInGroup(true);
+			StructureBlocksRegistries.STRUCTURE_GROUPS.register(groupID, loadedGroup);
 		}
 
 		BlockEvents.registerBlockEventAction(BlockActionFaceAwayFromPlayer.class);

@@ -31,7 +31,13 @@ public class JigsawBlockMenu extends BlockEntityMenu<JigsawBlockEntity> {
         this.blockName = this.createTextInput(0, 70, 700, 50, "Name: ", "");
         this.blockName.hAnchor = HorizontalAnchor.CENTERED;
 
-        this.structureGroupID = new ElementSelectButton<>(0, 130, 700, 50, HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED, this, StructureGroup.ALL_STRUCTURE_GROUPS);
+        this.structureGroupID = new ElementSelectButton<>(0, 130, 700, 50, HorizontalAnchor.CENTERED, VerticalAnchor.TOP_ALIGNED, this, StructureGroup.ALL_STRUCTURE_GROUPS){
+            @Override
+            public void onMouseReleased() {
+                if (FixedTextBoxElement.currentTextBoxElement != null) FixedTextBoxElement.currentTextBoxElement.deactivate();
+                super.onMouseReleased();
+            }
+        };
         this.addFluxElement(this.structureGroupID);
 
         this.replaceWith = this.createTextInput(0, 190, 700, 50, "Replace with: ", "");

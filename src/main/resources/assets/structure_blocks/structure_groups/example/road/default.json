@@ -1,0 +1,50 @@
+{
+"structures": [
+	{
+		"structure_blocks:road/straight_small_x": 2
+	},
+	{
+		"structure_blocks:road/straight_medium_x": 4
+	},
+	{
+		"structure_blocks:road/straight_long_x": 3
+	},
+	{
+		"structure_blocks:road/straight_small_z": 2
+	},
+	{
+		"structure_blocks:road/straight_medium_z": 3
+	},
+	{
+		"structure_blocks:road/straight_long_z": 4
+	},
+	{
+		"structure_blocks:road/turn_posx_posz": 1
+	},
+	{
+		"structure_blocks:road/turn_posx_negz": 1
+	},
+	{
+		"structure_blocks:road/turn_negx_negz": 1
+	},
+	{
+		"structure_blocks:road/turn_negx_posz": 1
+	},
+	{
+		"structure_blocks:road/t_section_posx": 1
+	},
+	{
+		"structure_blocks:road/t_section_negx": 1
+	},
+	{
+		"structure_blocks:road/t_section_posz": 1
+	},
+	{
+		"structure_blocks:road/t_section_negz": 1
+	},
+	{
+		"structure_blocks:road/crossroads": 1
+	}
+],
+"idString": "structure_blocks:example/road/default"
+}
