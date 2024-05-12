@@ -23,6 +23,9 @@ public class FixedScrollMenu extends BasicMenu implements InputProcessor {
     public float upDistance = 3.25F;
     public float downDistance = 3.25F;
 
+    public float defaultElementWidth = 250;
+    public float defaultElementHeight = 50;
+
     public FixedScrollMenu(GameState previousState) {
         super(previousState);
         this.playSound = true;
@@ -90,8 +93,8 @@ public class FixedScrollMenu extends BasicMenu implements InputProcessor {
             BaseText button = this.elements.get(index);
             button.x = 0.0F;
             button.y = y - 50.0F;
-            button.width = 250.0F * size;
-            button.height = 50.0F * size;
+            button.width = this.defaultElementWidth * size;
+            button.height = this.defaultElementHeight * size;
             button.fontSize = 18.0F * size;
             button.visible = distance2 < this.downDistance && distance2 > -this.upDistance;
             button.updateText();

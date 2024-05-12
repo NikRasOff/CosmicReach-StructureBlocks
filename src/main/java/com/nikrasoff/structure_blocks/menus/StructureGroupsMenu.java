@@ -10,7 +10,7 @@ import finalforeach.cosmicreach.ui.HorizontalAnchor;
 import finalforeach.cosmicreach.ui.VerticalAnchor;
 
 public class StructureGroupsMenu extends BasicMenu {
-    private ButtonTextBox newGroup;
+    private final ButtonTextBox newGroup;
     public void switchTo(){
         this.previousState = GameState.currentGameState;
         GameState.switchToGameState(this);
@@ -47,6 +47,7 @@ public class StructureGroupsMenu extends BasicMenu {
     }
 
     private void createNewGroup(){
+        if (this.newGroup.getContent().isEmpty()) return;
         StructureGroup newStructureGroup = new StructureGroup(this.newGroup.getContent());
         GameState.switchToGameState(new StructureGroupEditMenu(newStructureGroup, this));
     }

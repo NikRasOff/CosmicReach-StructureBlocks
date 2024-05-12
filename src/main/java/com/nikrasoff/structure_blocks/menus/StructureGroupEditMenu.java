@@ -22,6 +22,7 @@ public class StructureGroupEditMenu extends FixedScrollMenu {
         super(prevGameState);
         this.upDistance = 1.55F;
         this.editedGroup = group;
+        this.defaultElementWidth = 750;
 
         for (StructureGroup.StructureGroupEntry structure : this.editedGroup.structures){
             StructureDisplay structureEdit = new StructureDisplay(structure);
